@@ -1,0 +1,47 @@
+<?php
+include 'koneksi.php';
+
+// Tambah pesan
+if (isset($_POST['simpan'])) {
+    $nama_pengirim = $_POST['nama_pengirim'];
+    $isi_pesan = $_POST['isi_pesan'];
+    $pengantin_id = $_POST['pengantin_id'];
+
+    $stmt = $weddingku->prepare("INSERT INTO message (nama_pengirim, isi_pesan, pengantin_id) VALUES (?, ?, ?)");
+    $stmt->bind_param("ssi", $nama_pengirim, $isi_pesan, $pengantin_id);
+    $stmt->execute();
+    $stmt->close();
+
+    header('Location: message.php');
+    exit;
+}
+
+// Update pesan
+if (isset($_POST['update'])) {
+    $id = $_POST['id'];
+    $nama_pengirim = $_POST['nama_pengirim'];
+    $isi_pesan = $_POST['isi_pesan'];
+    $pengantin_id = $_POST['pengantin_id'];
+
+    $stmt = $weddingku->prepare("UPDATE message SET nama_pengirim=?, isi_pesan=?, pengantin_id=? WHERE id=?");
+    $stmt->bind_param("ssii", $nama_pengirim, $isi_pesan, $pengantin_id, $id);
+    $stmt->execute();
+    $stmt->close();
+
+    header('Location: message.php');
+    exit;
+}
+
+// Hapus pesan
+if (isset($_GET['hapus'])) {
+    $id = $_GET['hapus'];
+
+    $stmt = $weddingku->prepare("DELETE FROM message WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+
+    header('Location: message.php');
+    exit;
+}
+?>

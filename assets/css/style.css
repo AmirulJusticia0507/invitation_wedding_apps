@@ -1,0 +1,351 @@
+      /* Global Styles */
+      body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      h2, h4 {
+        font-family: 'Great Vibes', cursive;
+        font-size: 2em;
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 10px 25px;
+        font-size: 16px;
+        background-color: #8B5E3C;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      /* Slide Styles */
+      .slide {
+      height: 100vh; /* Ganti dari min-height */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-size: cover;
+      background-position: center;
+      text-align: center;
+      color: white;
+      padding: 2rem;
+      position: relative;
+    }
+
+
+      .slide-1 {
+        background-color: #f5efe4;
+        color: #333;
+      }
+
+      .slide-1 h1 {
+        font-family: 'Great Vibes', cursive;
+        font-size: 4em;
+        margin-bottom: 10px;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+      }
+
+      .slide > *:not(.overlay) {
+        position: relative;
+        z-index: 2;
+      }
+
+      /* Button Styles */
+      .btn-buka {
+        background-color: #fff;
+        border: 2px solid #d4af37;
+        color: #d4af37;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-buka:hover {
+        background-color: #d4af37;
+        color: white;
+        transform: scale(1.05);
+      }
+
+      /* Content Wrappers */
+      .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        color: #fff;
+      }
+
+      .gift, .message-form {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 15px;
+        width: 90%;
+        max-width: 600px;
+      }
+
+      .bank-info p {
+        margin: 5px 0;
+        font-size: 16px;
+      }
+
+      /* Message Form Styles */
+      .message-form {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 12px;
+        max-width: 600px;
+        margin: 20px auto;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        color: #333;
+      }
+
+      .message-form h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 24px;
+        color: #222;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #555;
+      }
+
+      .form-group i {
+        margin-right: 6px;
+        color: #ff69b4;
+      }
+
+      /* Input and Textarea Styles */
+      .message-form input,
+      .message-form textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+
+      .message-form input::placeholder,
+      .message-form textarea::placeholder {
+        color: #bbb;
+        transition: color 0.3s ease;
+      }
+
+      .message-form input:focus::placeholder,
+      .message-form textarea:focus::placeholder {
+        color: #ffb6c1;
+      }
+
+      /* Button Submit Styles */
+      .btn-submit {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #ff69b4, #ff85c1);
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(255, 105, 180, 0.4);
+        transition: all 0.3s ease-in-out;
+      }
+
+      .btn-submit:hover {
+        background: linear-gradient(135deg, #ff85c1, #ff69b4);
+        transform: scale(1.03);
+        box-shadow: 0 6px 18px rgba(255, 105, 180, 0.6);
+      }
+
+      /* History Ucapan Styles */
+      .ucapan-history {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .ucapan-history h4 {
+        font-size: 1.5rem;
+        color: #333;
+      }
+
+      .ucapan-history ul {
+        list-style-type: none;
+        padding-left: 0;
+      }
+
+      .ucapan-history li {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        padding: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      #story-carousel .story-item {
+        display: none;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
+
+      #story-carousel .story-item:first-of-type {
+        display: block;
+      }
+
+      .story-item h5 {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .story-item p {
+        font-size: 16px;
+        margin-top: 10px;
+      }
+
+      .btn-outline-light {
+        margin-top: 10px;
+      }
+
+      #countdown {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        font-size: 2rem;
+        font-weight: bold;
+      }
+
+      .time-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.7); /* Background kotak */
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        width: 80px;
+        height: 100px;
+      }
+
+      .time-box span {
+        font-size: 3rem; /* Ukuran angka lebih besar */
+        margin-bottom: 10px;
+      }
+
+      .time-box p {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .photo-frame {
+          border: 3px solid #fff;  /* Warna border putih */
+          padding: 5px;  /* Jarak antara gambar dan border */
+          border-radius: 50%;  /* Membuat border menjadi lingkaran */
+          display: inline-block;  /* Membuat foto tetap berada di dalam kotak */
+      }
+
+      /* Menyembunyikan tombol di mobile */
+      @media (max-width: 768px) {
+          .button-prev, .button-next {
+              display: none;
+          }
+      }
+
+      /* Menampilkan tombol di desktop */
+      @media (min-width: 769px) {
+          .button-prev, .button-next {
+              display: block;
+          }
+      }
+
+    /* Tombol Toggle Sidebar */
+    .sidebar-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      background-color: #8B5E3C;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Sidebar */
+    .slide-sidebar {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      width: 200px;
+      display: none; /* default: hidden */
+    }
+
+    .slide-sidebar h4 {
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .slide-sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .slide-sidebar ul li {
+      margin-bottom: 8px;
+    }
+
+    .slide-sidebar ul li a {
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s ease;
+    }
+
+    .slide-sidebar ul li a:hover {
+      color: #8B5E3C;
+      text-decoration: underline;
+    }
+
+    .rekening-nomor {
+        font-size: 1.5rem; /* Ukuran font lebih besar */
+        font-weight: bold;
+    }

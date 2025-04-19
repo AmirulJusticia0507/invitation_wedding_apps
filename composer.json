@@ -1,0 +1,11 @@
+{
+    "name": "amirul/invitation-wedding-apps",
+    "authors": [
+        {
+            "name": "amirulputrajusticia"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "1.28"
+    }
+}
