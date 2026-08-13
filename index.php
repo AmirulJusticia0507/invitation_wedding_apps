@@ -11,6 +11,7 @@ $sql = "SELECT
             u.id AS undangan_url_id,
             u.tamu_id,
             tu.nama AS nama_tamu,
+            p.id AS id_pengantin,
             p.nama_pria,
             p.nama_wanita,
             p.ortu_pria,
@@ -23,12 +24,10 @@ $sql = "SELECT
             p.jam_resepsi,
             p.alamat_wanita,
             p.foto_pria,
-            p.foto_wanita,
-            s.deskripsi AS cerita
+            p.foto_wanita
         FROM undangan_url u
         JOIN tamu tu ON tu.id = u.tamu_id
         JOIN pengantin p ON p.id = u.pengantin_id
-        LEFT JOIN story s ON s.pengantin_id = p.id
         WHERE u.encrypted_token = ?";
 
 $stmt = $weddingku->prepare($sql);
@@ -108,10 +107,19 @@ while ($gift = $result_gift->fetch_assoc()) {
 
 // Fungsi bantu format tanggal
 function formatTanggalIndo($date) {
+    if (empty($date)) {
+        return 'Tanggal belum diatur';
+    }
+
     $hari = ['Sunday'=>'Minggu','Monday'=>'Senin','Tuesday'=>'Selasa','Wednesday'=>'Rabu','Thursday'=>'Kamis','Friday'=>'Jumat','Saturday'=>'Sabtu'];
     $bulan = ['January'=>'Januari','February'=>'Februari','March'=>'Maret','April'=>'April','May'=>'Mei','June'=>'Juni','July'=>'Juli','August'=>'Agustus','September'=>'September','October'=>'Oktober','November'=>'November','December'=>'Desember'];
 
-    $dt = new DateTime($date);
+    try {
+        $dt = new DateTime($date);
+    } catch (Exception $e) {
+        return $date;
+    }
+
     $hariIni = $hari[$dt->format('l')];
     $bulanIni = $bulan[$dt->format('F')];
 
@@ -216,22 +224,32 @@ function formatTanggalIndo($date) {
     <!-- Foto Pengantin dan Informasi -->
     <div class="d-flex flex-column justify-content-center align-items-center gap-4 mb-4">
         <!-- Foto Pengantin Pria dan Wanita -->
-        <div class="d-flex justify-content-center gap-5 flex-wrap">
-            <div class="text-center">
-                <div class="photo-frame">
-                    <img src="uploads/<?= htmlspecialchars($data['foto_pria']) ?>" alt="Pengantin Pria" class="rounded-circle" width="150" height="150">
-                </div>
-                <p class="mt-2 text-white"><?= htmlspecialchars($data['nama_panggilan_pria']) ?></p>
-                <p class="text-white">Orang Tua: <br><?= htmlspecialchars($data['ortu_pria']) ?></p>
+    <?php $foto_pria = !empty($data['foto_pria']) ? htmlspecialchars($data['foto_pria']) : ''; ?>
+    <?php $foto_wanita = !empty($data['foto_wanita']) ? htmlspecialchars($data['foto_wanita']) : ''; ?>
+    <div class="d-flex justify-content-center gap-5 flex-wrap">
+        <div class="text-center">
+            <div class="photo-frame">
+                <?php if ($foto_pria): ?>
+                    <img src="uploads/<?= $foto_pria ?>" alt="Pengantin Pria" class="rounded-circle" width="150" height="150">
+                <?php else: ?>
+                    <img src="images/istockphoto-487583818-1024x1024.jpg" alt="Pengantin Pria" class="rounded-circle" width="150" height="150" style="background:#eee;">
+                <?php endif; ?>
             </div>
-            <div class="text-center">
-                <div class="photo-frame">
-                    <img src="uploads/<?= htmlspecialchars($data['foto_wanita']) ?>" alt="Pengantin Wanita" class="rounded-circle" width="150" height="150">
-                </div>
-                <p class="mt-2 text-white"><?= htmlspecialchars($data['nama_panggilan_wanita']) ?></p>
-                <p class="text-white">Orang Tua: <br><?= htmlspecialchars($data['ortu_wanita']) ?></p>
-            </div>
+            <p class="mt-2 text-white"><?= htmlspecialchars($data['nama_panggilan_pria']) ?></p>
+            <p class="text-white">Orang Tua: <br><?= htmlspecialchars($data['ortu_pria']) ?></p>
         </div>
+        <div class="text-center">
+            <div class="photo-frame">
+                <?php if ($foto_wanita): ?>
+                    <img src="uploads/<?= $foto_wanita ?>" alt="Pengantin Wanita" class="rounded-circle" width="150" height="150">
+                <?php else: ?>
+                    <img src="images/istockphoto-487583818-1024x1024.jpg" alt="Pengantin Wanita" class="rounded-circle" width="150" height="150" style="background:#eee;">
+                <?php endif; ?>
+            </div>
+            <p class="mt-2 text-white"><?= htmlspecialchars($data['nama_panggilan_wanita']) ?></p>
+            <p class="text-white">Orang Tua: <br><?= htmlspecialchars($data['ortu_wanita']) ?></p>
+        </div>
+    </div>
 
         <!-- Akad Nikah -->
         <h2 class="text-center text-white">Akad Nikah</h2>
@@ -290,7 +308,7 @@ function formatTanggalIndo($date) {
       }).then((result) => {
           if (result.isConfirmed) {
               // Jika pengguna klik "Tidak Bisa Hadir", redirect ke rsvp_handler.php dengan token
-              const token = "<?= $token ?>"; // Ambil token PHP
+              const token = <?= json_encode($token) ?>; // Ambil token PHP
               window.location.href = `rsvp_handler.php?uid=${token}`; // Redirect
           }
       });
@@ -321,7 +339,7 @@ function formatTanggalIndo($date) {
                       : 'Deskripsi tidak tersedia';
 
           echo '<div class="story-item" style="display: block;">';
-          echo '<h5>📅 ' . formatTanggalIndo($bulan . ' ' . $tahun) . '</h5>';
+          echo '<h5>📅 ' . htmlspecialchars($bulan . ' ' . $tahun) . '</h5>';
           echo '<p>' . $deskripsi . '</p>';
           echo '</div>';
         }
@@ -350,22 +368,23 @@ function formatTanggalIndo($date) {
 
     <div class="row justify-content-center">
     <?php
-      include 'koneksi.php';
-
       // Pastikan $data sudah ada dan memuat id pengantin
-      if (!isset($data['id_pengantin'])) {
+      if (empty($data['id_pengantin'])) {
           echo "<p>Galeri tidak tersedia.</p>";
       } else {
           $pengantin_id = (int) $data['id_pengantin']; // Cast ke int untuk keamanan
-          $query = "SELECT * FROM gallery WHERE pengantin_id = $pengantin_id ORDER BY tanggal_upload DESC";
-          $result = mysqli_query($conn, $query);
-          if ($result && mysqli_num_rows($result) > 0) {
-              while ($foto = mysqli_fetch_assoc($result)) {
+          $stmt_gallery = $weddingku->prepare("SELECT * FROM gallery WHERE pengantin_id = ? ORDER BY tanggal_upload DESC");
+          $stmt_gallery->bind_param("i", $pengantin_id);
+          $stmt_gallery->execute();
+          $result_gallery = $stmt_gallery->get_result();
+
+          if ($result_gallery->num_rows > 0) {
+              while ($foto = $result_gallery->fetch_assoc()) {
                   echo '<div class="col-6 col-md-4 mb-4">';
                   echo '  <div class="gallery-item">';
                   // Tambahkan data-lightbox dan data-title untuk lightbox
-                  echo '   <a href="uploads/gallery/' . htmlspecialchars($foto['file']) . '" data-lightbox="gallery" data-title="' . htmlspecialchars($foto['judul']) . '">';
-                  echo '      <img src="uploads/gallery/' . htmlspecialchars($foto['file']) . '" alt="' . htmlspecialchars($foto['judul']) . '" class="img-fluid rounded shadow">';
+                  echo '   <a href="assets/gallery/' . htmlspecialchars($foto['file']) . '" data-lightbox="gallery" data-title="' . htmlspecialchars($foto['judul']) . '">';
+                  echo '      <img src="assets/gallery/' . htmlspecialchars($foto['file']) . '" alt="' . htmlspecialchars($foto['judul']) . '" class="img-fluid rounded shadow">';
                   echo '   </a>';
                   echo '   <p class="mt-2">' . htmlspecialchars($foto['judul']) . '</p>';
                   echo '  </div>';
@@ -489,18 +508,11 @@ function copyToClipboard(elementId) {
 
 
 <?php
-// Ambil data dari database
-$sql = "SELECT 
-            tanggal_akad, 
-            jam_akad 
-        FROM weddingku_db.pengantin 
-        WHERE id = 1"; // Ganti dengan ID pengantin yang sesuai
-$result = $weddingku->query($sql);
-$data = $result->fetch_assoc();
-
-// Gabungkan tanggal dan jam akad untuk membuat waktu lengkap
-$akadDateTime = $data['tanggal_akad'] . 'T' . $data['jam_akad']; // Format 'Y-m-d\TH:i:s'
-
+// Gabungkan tanggal dan jam akad pengantin (dari query utama sesuai token undangan)
+$akadDateTime = '';
+if (!empty($data['tanggal_akad']) && !empty($data['jam_akad'])) {
+    $akadDateTime = $data['tanggal_akad'] . 'T' . $data['jam_akad'];
+}
 ?>
 
 <!-- SweetAlert2 CDN -->
@@ -550,7 +562,7 @@ $akadDateTime = $data['tanggal_akad'] . 'T' . $data['jam_akad']; // Format 'Y-m-
         // Mengambil parameter 'uid' dan 'guest' dari URL saat ini
         const urlParams = new URLSearchParams(window.location.search);
         const uid = urlParams.get('uid');  // Ambil nilai 'uid' dari URL
-        const guest = urlParams.get('guest');  // Ambil nilai 'guest' dari URL
+        const guest = urlParams.get('guest') || <?= json_encode($data['nama_tamu']) ?>;  // Ambil nilai 'guest' dari URL, fallback ke nama tamu terdaftar
 
         if (nama && isi && uid && guest) {  // Pastikan semua data ada
             const xhr = new XMLHttpRequest();
@@ -671,16 +683,6 @@ $akadDateTime = $data['tanggal_akad'] . 'T' . $data['jam_akad']; // Format 'Y-m-
     stories[storyIndex].style.display = 'block';
   }
 
-// Mengambil waktu akad yang sudah digabungkan dari PHP
-const akadDateTime = new Date('<?= $akadDateTime ?>'); // PHP menghasilkan format yang bisa dipakai JavaScript
-
-// Cek apakah waktu akad valid
-if (isNaN(akadDateTime.getTime())) {
-    console.error("Waktu akad tidak valid");
-} else {
-    console.log("Waktu akad yang valid: ", akadDateTime);
-}
-
   // Fungsi untuk memperbarui countdown
   function updateCountdown() {
       const now = new Date();
@@ -689,7 +691,7 @@ if (isNaN(akadDateTime.getTime())) {
       // Cek apakah waktu akad sudah lewat
       if (timeLeft <= 0) {
           document.getElementById('countdown').innerHTML = "Waktu Akad telah tiba!";
-          clearInterval(countdownInterval); // Hentikan interval jika waktu sudah habis
+          if (countdownInterval) clearInterval(countdownInterval); // Hentikan interval jika waktu sudah habis
           return;
       }
 
@@ -706,17 +708,34 @@ if (isNaN(akadDateTime.getTime())) {
       document.getElementById('seconds').innerHTML = seconds;
   }
 
-  // Perbarui countdown setiap detik
-  const countdownInterval = setInterval(updateCountdown, 1000);
+  let countdownInterval = null;
 
-    function centerSlides() {
-    const slides = document.querySelectorAll('.slide');
-    slides.forEach(slide => {
+  // Mengambil waktu akad yang sudah digabungkan dari PHP
+  const akadDateTime = new Date('<?= $akadDateTime ?>'); // PHP menghasilkan format yang bisa dipakai JavaScript
+
+  // Cek apakah waktu akad valid
+  if (isNaN(akadDateTime.getTime())) {
+      document.getElementById('countdown').innerHTML = "Tanggal akad belum ditentukan";
+      console.error("Waktu akad tidak valid");
+  } else {
+      updateCountdown();
+      countdownInterval = setInterval(updateCountdown, 1000);
+  }
+
+  function centerSlide(slide) {
+      if (!slide) return;
       slide.style.display = 'flex';
       slide.style.flexDirection = 'column';
       slide.style.justifyContent = 'center';
       slide.style.alignItems = 'center';
-    });
+  }
+
+  function centerSlides() {
+      document.querySelectorAll('.slide').forEach(slide => {
+          if (slide.style.display !== 'none') {
+              centerSlide(slide);
+          }
+      });
   }
 
   window.addEventListener('load', centerSlides);
@@ -755,8 +774,6 @@ if (isNaN(akadDateTime.getTime())) {
   } else {
     document.getElementById("lokasiDevice").textContent = "tidak tersedia";
   }
-
-  var lightbox = new SimpleLightbox('[data-lightbox]', { /* options */ });
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js")

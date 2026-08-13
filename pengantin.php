@@ -316,7 +316,7 @@
                 },
             }
         });
-    });
+    });
 
-    var lightbox = new SimpleLightbox('[data-lightbox]', { /* options */ });
+
 </script>
