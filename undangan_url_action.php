@@ -87,4 +87,24 @@ if (isset($_GET['hapus'])) {
     header("Location: undangan_url.php");
     exit;
 }
+
+// Proses konfirmasi RSVP
+if (isset($_POST['konfirmasi'])) {
+    csrf_verify();
+    $id = (int) $_POST['id'];
+    $status = $_POST['status']; // 'hadir' atau 'tidak_hadir'
+
+    // Validasi status
+    if ($status !== 'hadir' && $status !== 'tidak_hadir') {
+        die("Status tidak valid!");
+    }
+
+    // Update status RSVP
+    $stmt = $weddingku->prepare("UPDATE undangan_url SET status_rsvp = ? WHERE id = ?");
+    $stmt->bind_param("si", $status, $id);
+    $stmt->execute();
+
+    header("Location: undangan_url.php");
+    exit;
+}
 ?>
