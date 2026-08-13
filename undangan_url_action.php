@@ -1,4 +1,5 @@
 <?php
+include 'auth_check.php';
 include 'koneksi.php';
 
 // Fungsi untuk menghasilkan token undangan unik

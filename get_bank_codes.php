@@ -1,4 +1,5 @@
 <?php
+include 'auth_check.php';
 include 'koneksi.php'; // Masukkan file koneksi ke database
 
 if (isset($_GET['term'])) {

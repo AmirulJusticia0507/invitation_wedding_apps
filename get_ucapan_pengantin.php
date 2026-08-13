@@ -1,4 +1,5 @@
 <?php
+include 'auth_check.php';
 include 'koneksi.php';
 
 if (isset($_GET['pengantin_id'])) {

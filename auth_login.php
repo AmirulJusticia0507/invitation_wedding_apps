@@ -1,9 +1,23 @@
 <?php
 include 'koneksi.php';
-session_start();
+session_start([
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Lax',
+]);
+session_regenerate_id(true);
 
-$email = $_POST['email'];
-$password = $_POST['password'];
+$email = isset($_POST['email']) ? trim($_POST['email']) : '';
+$password = isset($_POST['password']) ? $_POST['password'] : '';
+
+if ($email === '' || $password === '') {
+    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+    echo "<script>
+        Swal.fire('Error', 'Email dan password wajib diisi!', 'error').then(() => {
+            window.history.back();
+        });
+    </script>";
+    exit;
+}
 
 $stmt = $weddingku->prepare("SELECT id, password FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
@@ -21,7 +35,7 @@ if ($result->num_rows > 0) {
      else {
         echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
         echo "<script>
-            Swal.fire('Error', 'Password salah!', 'error').then(() => {
+            Swal.fire('Error', 'Email atau password salah!', 'error').then(() => {
                 window.history.back();
             });
         </script>";
@@ -29,7 +43,7 @@ if ($result->num_rows > 0) {
 } else {
     echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
     echo "<script>
-        Swal.fire('Error', 'Email tidak ditemukan!', 'error').then(() => {
+        Swal.fire('Error', 'Email atau password salah!', 'error').then(() => {
             window.history.back();
         });
     </script>";

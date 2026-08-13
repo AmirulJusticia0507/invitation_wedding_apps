@@ -1,4 +1,5 @@
 <?php 
+include 'auth_check.php';
 include 'koneksi.php';
 
 // Fungsi untuk membuat slug dari nama folder

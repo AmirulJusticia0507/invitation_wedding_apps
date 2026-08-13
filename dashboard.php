@@ -1,10 +1,5 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
+include 'auth_check.php';
 include 'koneksi.php'; // Pastikan koneksi aktif
 
 // Total pengantin

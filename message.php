@@ -1,3 +1,4 @@
+<?php include 'auth_check.php'; ?>
 <?php include 'koneksi.php'; ?>
 <?php include 'header.php'; ?>
 <?php include 'sidebar.php'; ?>

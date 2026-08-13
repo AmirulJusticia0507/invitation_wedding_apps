@@ -1,4 +1,5 @@
 <?php
+include 'auth_check.php';
 include 'koneksi.php';
 require 'vendor/autoload.php'; // pastikan ini ada setelah composer install
 
