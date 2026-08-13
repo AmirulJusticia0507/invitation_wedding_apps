@@ -3,11 +3,6 @@
 <?php include 'header.php'; ?>
 <?php include 'sidebar.php'; ?>
 
-<?php
-$pengantinId = isset($_GET['pengantin_id']) ? $_GET['pengantin_id'] : '';
-$filterQuery = $pengantinId ? "WHERE pengantin_id = $pengantinId" : '';
-?>
-
 <div class="content-wrapper">
     <!-- Breadcrumb -->
     <div class="breadcrumb-section">
@@ -63,7 +58,7 @@ $filterQuery = $pengantinId ? "WHERE pengantin_id = $pengantinId" : '';
                             <h5 class='card-title'>{$row['judul']}</h5>
                             <p class='card-text'><small>{$row['tanggal_upload']}</small></p>
                             <button class='btn btn-sm btn-warning' data-bs-toggle='modal' data-bs-target='#modalEditFoto{$row['id']}'>Edit</button>
-                            <a href='gallery_action.php?hapus={$row['id']}' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin ingin menghapus foto ini?')\">Hapus</a>
+                            <a href='" . csrf_url("gallery_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin ingin menghapus foto ini?')\">Hapus</a>
                         </div>
                     </div>
                 </div>
@@ -105,7 +100,7 @@ $filterQuery = $pengantinId ? "WHERE pengantin_id = $pengantinId" : '';
                     <td>{$row['tanggal_upload']}</td>
                     <td>
                         <button class='btn btn-warning btn-sm' data-bs-toggle='modal' data-bs-target='#modalEditFoto{$row['id']}'>Edit</button>
-                        <a href='gallery_action.php?hapus={$row['id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Hapus foto ini?\")'>Hapus</a>
+                        <a href='" . csrf_url("gallery_action.php?hapus={$row['id']}") . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Hapus foto ini?\")'>Hapus</a>
                     </td>
                     </tr>
                 ";
@@ -126,6 +121,7 @@ $filterQuery = $pengantinId ? "WHERE pengantin_id = $pengantinId" : '';
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
+          <?= csrf_field() ?>
           <div class="mb-3">
             <label for="judul" class="form-label">Judul Foto</label>
             <input type="text" name="judul" class="form-control" placeholder="Misal: Momen Akad Nikah" required>

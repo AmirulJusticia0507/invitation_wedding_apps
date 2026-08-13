@@ -42,7 +42,7 @@
                     <td>{$row['tanggal']}</td>
                     <td>
                         <button class='btn btn-sm btn-warning' data-bs-toggle='modal' data-bs-target='#modalEditStory{$row['id']}'>Edit</button>
-                        <a href='story_action.php?hapus={$row['id']}' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin ingin menghapus cerita ini?')\">Hapus</a>
+                        <a href='" . csrf_url("story_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin ingin menghapus cerita ini?')\">Hapus</a>
                     </td>
                 </tr>";
 
@@ -54,6 +54,7 @@
                             <form method='POST' action='story_action.php'>
                                 <div class='modal-header'><h5>Edit Cerita</h5></div>
                                 <div class='modal-body'>
+                                    <?= csrf_field() ?>
                                     <input type='hidden' name='id' value='{$row['id']}'>
                                     <select name='pengantin_id' class='form-control mb-2' required>
                                             <option value=''>-- Pilih Pengantin --</option>";
@@ -93,6 +94,7 @@
             <form method="POST" action="story_action.php">
                 <div class="modal-header"><h5>Tambah Cerita</h5></div>
                 <div class="modal-body">
+                    <?= csrf_field() ?>
                     <select name="pengantin_id" class="form-control mb-2" required>
                         <option value="">-- Pilih Pengantin --</option>
                         <?php

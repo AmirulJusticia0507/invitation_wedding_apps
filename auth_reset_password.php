@@ -18,7 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ss", $new_password, $email);
         $stmt->execute();
 
-        $weddingku->query("DELETE FROM password_resets WHERE email = '$email'");
+        $stmt_del = $weddingku->prepare("DELETE FROM password_resets WHERE email = ?");
+        $stmt_del->bind_param("s", $email);
+        $stmt_del->execute();
 
         echo json_encode(["status" => "success", "message" => "Password berhasil direset."]);
     } else {

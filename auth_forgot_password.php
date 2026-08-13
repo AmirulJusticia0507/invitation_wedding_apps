@@ -15,7 +15,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $token = bin2hex(random_bytes(32));
         $expire = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
-        $weddingku->query("DELETE FROM password_resets WHERE email = '$email'");
+        $stmt_del = $weddingku->prepare("DELETE FROM password_resets WHERE email = ?");
+        $stmt_del->bind_param("s", $email);
+        $stmt_del->execute();
+
         $stmt = $weddingku->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $email, $token, $expire);
         $stmt->execute();

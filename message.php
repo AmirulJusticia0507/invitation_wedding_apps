@@ -41,7 +41,7 @@
                     <td>{$row['pesan']}</td>
                     <td>
                         <button class='btn btn-sm btn-warning' data-bs-toggle='modal' data-bs-target='#modalEditPesan{$row['id']}'>Edit</button>
-                        <a href='message_action.php?hapus={$row['id']}' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin hapus pesan ini?')\">Hapus</a>
+                        <a href='" . csrf_url("message_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin hapus pesan ini?')\">Hapus</a>
                     </td>
                 </tr>";
 
@@ -49,13 +49,14 @@
                 echo "
                 <div class='modal fade' id='modalEditPesan{$row['id']}'>
                     <div class='modal-dialog'>
-                        <div class='modal-content border-warning'>
-                            <form method='POST' action='message_action.php'>
-                                <div class='modal-header bg-warning text-dark'>
-                                    <h5 class='modal-title'><i class='fas fa-edit me-2'></i>Edit Ucapan</h5>
-                                    <button type='button' class='btn-close' data-bs-dismiss='modal'></button>
-                                </div>
-                                <div class='modal-body'>
+                <div class='modal-content border-warning'>
+                    <form method='POST' action='message_action.php'>
+                        <div class='modal-header bg-warning text-dark'>
+                            <h5 class='modal-title'><i class='fas fa-edit me-2'></i>Edit Ucapan</h5>
+                            <button type='button' class='btn-close' data-bs-dismiss='modal'></button>
+                        </div>
+                        <div class='modal-body'>
+                            <?= csrf_field() ?>
                                     <input type='hidden' name='id' value='{$row['id']}'>
                                     <div class='form-group mb-3'>
                                         <label>Nama Pengirim</label>
@@ -89,12 +90,13 @@
 <div class="modal fade" id="modalTambahPesan">
     <div class="modal-dialog">
         <div class="modal-content border-primary">
-            <form method="POST" action="message_action.php">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-envelope-open-text me-2"></i>Tambah Ucapan Spesial</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
+            <form method="POST" action="message_action.php">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-envelope-open-text me-2"></i>Tambah Ucapan Spesial</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <?= csrf_field() ?>
                     <div class='form-group mb-3'>
                         <label>Untuk Pengantin</label>
                         <select name='pengantin_id' class='form-select' required>

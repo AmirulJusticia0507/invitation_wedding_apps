@@ -36,7 +36,7 @@
                             <td>{$row['deskripsi']}</td>
                             <td>
                                 <button class='btn btn-sm btn-warning' data-bs-toggle='modal' data-bs-target='#modalEditFolder{$row['id']}'>Edit</button>
-                                <a href='folder_action.php?hapus={$row['id']}' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin hapus folder?')\">Hapus</a>
+                                <a href='" . csrf_url("folder_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin hapus folder?')\">Hapus</a>
                             </td>
                         </tr>";
 
@@ -50,6 +50,7 @@
                                         <h5>Edit Folder</h5>
                                     </div>
                                     <div class='modal-body'>
+                                        <?= csrf_field() ?>
                                         <input type='hidden' name='id' value='{$row['id']}'>
                                         <input type='text' name='nama_folder' class='form-control mb-2' value='{$row['nama_folder']}' required>
                                         <textarea name='deskripsi' class='form-control mb-2'>{$row['deskripsi']}</textarea>
@@ -93,6 +94,7 @@
             <form method="POST" action="folder_action.php">
                 <div class="modal-header"><h5>Tambah Folder</h5></div>
                 <div class="modal-body">
+                    <?= csrf_field() ?>
                     <input type="text" name="nama_folder" class="form-control mb-2" placeholder="Nama Folder" required>
                     <textarea name="deskripsi" class="form-control mb-2" placeholder="Deskripsi (Opsional)"></textarea>
                     <!-- Dropdown Pengantin -->

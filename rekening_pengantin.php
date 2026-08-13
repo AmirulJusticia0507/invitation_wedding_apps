@@ -51,7 +51,7 @@
                         <button class='btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1' data-bs-toggle='modal' data-bs-target='#modalEditRekening{$row['id']}'>
                             <i class='fas fa-edit'></i> Edit
                         </button>
-                        <a href='rekening_action.php?hapus={$row['id']}' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1' onclick=\"return confirm('Yakin hapus data rekening?')\">
+                        <a href='" . csrf_url("rekening_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1' onclick=\"return confirm('Yakin hapus data rekening?')\">
                             <i class='fas fa-trash-alt'></i> Hapus
                         </a>
                     </td>
@@ -67,6 +67,7 @@
                                     <h5>Edit Nomor Rekening</h5>
                                 </div>
                                 <div class='modal-body'>
+                                    <?= csrf_field() ?>
                                     <input type='hidden' name='id' value='{$row['id']}'>
                                     <select name='pengantin_id' class='form-control mb-2' required>
                                         <option value=''>-- Pilih Pengantin --</option>";
@@ -111,6 +112,7 @@
             <form method="POST" action="rekening_action.php">
                 <div class="modal-header"><h5>Tambah Nomor Rekening Pengantin</h5></div>
                 <div class="modal-body">
+                    <?= csrf_field() ?>
                     <?php
                     $pengantinList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
                     ?>

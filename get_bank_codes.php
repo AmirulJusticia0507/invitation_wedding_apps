@@ -2,9 +2,10 @@
 include 'auth_check.php';
 include 'koneksi.php'; // Masukkan file koneksi ke database
 
+header('Content-Type: application/json');
+
 if (isset($_GET['term'])) {
-    $term = $_GET['term']; // Ambil nilai dari parameter 'term'
-    echo "Term: " . $term; // Debugging untuk melihat term yang dikirimkan
+    $term = '%' . $_GET['term'] . '%'; // Ambil nilai dari parameter 'term'
     $query = "SELECT kode_bank, nama_bank FROM bank_list WHERE nama_bank LIKE ? LIMIT 10"; // Query pencarian bank berdasarkan nama
     $stmt = $weddingku->prepare($query);
     $stmt->bind_param("s", $term);

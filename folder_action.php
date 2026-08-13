@@ -18,13 +18,16 @@ function generateFolderForPasangan($pengantin_id) {
     }
 
     // Ambil data dari DB untuk pengantin
-    $res = $weddingku->query("SELECT * FROM pengantin WHERE id = $pengantin_id");
+    $stmt = $weddingku->prepare("SELECT * FROM pengantin WHERE id = ?");
+    $stmt->bind_param("i", $pengantin_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
     $data = $res->fetch_assoc();
     
     if ($data) {
         // Membuat nama folder berdasarkan nama pengantin
         $folderName = slugify($data['nama_panggilan_pria'] . '-' . $data['nama_panggilan_wanita']);
-        $targetDir = __DIR__ . "/invitation_wedding_apps/undangan/" . $folderName;
+        $targetDir = __DIR__ . "/undangan/" . $folderName;
 
         // Cek apakah folder sudah ada
         if (!file_exists($targetDir)) {
@@ -69,6 +72,7 @@ function recurse_copy($src, $dst) {
 
 // Menambah Folder
 if (isset($_POST['simpan'])) {
+    csrf_verify();
     $nama_folder = $_POST['nama_folder'];
     $deskripsi = $_POST['deskripsi'];
     $pengantin_id = $_POST['pengantin_id']; // Get pengantin_id from the form
@@ -92,6 +96,7 @@ if (isset($_POST['simpan'])) {
 
 // Mengupdate Folder
 if (isset($_POST['update'])) {
+    csrf_verify();
     $id = $_POST['id'];
     $nama_folder = $_POST['nama_folder'];
     $deskripsi = $_POST['deskripsi'];
@@ -115,6 +120,7 @@ if (isset($_POST['update'])) {
 
 // Menghapus Folder
 if (isset($_GET['hapus'])) {
+    csrf_verify();
     $id = $_GET['hapus'];
 
     // Hapus data folder
@@ -130,6 +136,7 @@ if (isset($_GET['hapus'])) {
 
 // Menambahkan folder untuk pasangan (generate folder untuk pengantin)
 if (isset($_POST['generate_folder'])) {
+    csrf_verify();
     $pengantin_id = $_POST['pengantin_id']; // Pastikan ada input untuk pengantin_id di form
     generateFolderForPasangan($pengantin_id);
 }

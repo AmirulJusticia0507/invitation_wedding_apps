@@ -67,7 +67,7 @@
                             <button class='btn btn-sm btn-outline-warning' data-bs-toggle='modal' data-bs-target='#modalEditUndangan{$row['id']}'>
                                 <i class='fas fa-edit'></i> Edit
                             </button>
-                            <a href='undangan_url_action.php?hapus={$row['id']}' class='btn btn-sm btn-outline-danger' onclick='return confirm(\"Yakin ingin hapus?\")'>
+                            <a href='" . csrf_url("undangan_url_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger' onclick='return confirm(\"Yakin ingin hapus?\")'>
                                 <i class='fas fa-trash'></i> Hapus
                             </a>
                         </td>
@@ -90,6 +90,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
+                <?= csrf_field() ?>
                 <div class="mb-3">
                     <label>Nama Pengantin</label>
                     <select name="pengantin_id" class="form-select" required>
@@ -196,6 +197,7 @@ while ($row = $data->fetch_assoc()) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
+                <?= csrf_field() ?>
                 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
                 <div class="mb-3">
                     <label>Nama Pengantin</label>

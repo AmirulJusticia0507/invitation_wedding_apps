@@ -71,9 +71,9 @@
                         <button class='btn btn-sm btn-outline-warning d-inline-flex align-items-center' data-bs-toggle='modal' data-bs-target='#modalEdit{$row['id']}'>
                             <i class='fas fa-edit me-1'></i> Edit
                         </button>
-                        <a href='pengantin_action.php?hapus={$row['id']}' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center' onclick=\"return confirm('Yakin hapus?')\">
-                            <i class='fas fa-trash-alt me-1'></i> Hapus
-                        </a>
+                    <a href='" . csrf_url("pengantin_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center' onclick=\"return confirm('Yakin hapus?')\">
+                        <i class='fas fa-trash-alt me-1'></i> Hapus
+                    </a>
                     </td>
                 </tr>";
 
@@ -85,6 +85,7 @@
                     <form method='POST' action='pengantin_action.php' enctype='multipart/form-data'>
                         <div class='modal-header'><h5>Edit Pengantin</h5></div>
                         <div class='modal-body'>
+                        <?= csrf_field() ?>
                         <input type='hidden' name='id' value='{$row['id']}'>
                         
                         <!-- Nama Pria -->
@@ -195,6 +196,7 @@
           <h5>Tambah Pengantin</h5>
         </div>
         <div class="modal-body">
+          <?= csrf_field() ?>
 
           <!-- Nama Pria -->
           <div class="input-group mb-3">

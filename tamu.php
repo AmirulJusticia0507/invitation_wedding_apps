@@ -22,8 +22,9 @@
 
         </br></br>
         <form action="import_tamu.php" method="POST" enctype="multipart/form-data" class="mb-3">
-            <div class="input-group" style="max-width: 500px;">
-                <input type="file" name="file_excel" class="form-control" accept=".xls,.xlsx" required>
+            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+            <div class="input-group" style="max-width: 500px;">
+                <input type="file" name="file_excel" class="form-control" accept=".xls,.xlsx" required>
                 <button type="submit" name="import" class="btn btn-success">
                     <i class="fa fa-upload"></i> Import Excel
                 </button>
@@ -57,7 +58,7 @@
                         <button class='btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1' data-bs-toggle='modal' data-bs-target='#modalEditTamu{$row['id']}'>
                             <i class='fas fa-edit'></i> Edit
                         </button>
-                        <a href='tamu_action.php?hapus={$row['id']}' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1' onclick=\"return confirm('Yakin hapus data tamu?')\">
+                    <a href='" . csrf_url("tamu_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1' onclick=\"return confirm('Yakin hapus data tamu?')\">
                             <i class='fas fa-trash-alt'></i> Hapus
                         </a>
                     </td>
@@ -73,6 +74,7 @@
                                     <h5>Edit Tamu</h5>
                                 </div>
                                 <div class='modal-body'>
+                                    <?= csrf_field() ?>
                                     <input type='hidden' name='id' value='{$row['id']}'>
                                     <input type='text' name='nama' class='form-control mb-2' value='{$row['nama']}' required>
                                     <textarea name='alamat' class='form-control mb-2'>{$row['alamat']}</textarea>
@@ -108,6 +110,7 @@
             <form method="POST" action="tamu_action.php">
                 <div class="modal-header"><h5>Tambah Tamu</h5></div>
                 <div class="modal-body">
+                <?= csrf_field() ?>
                 <?php
                 $pengantinList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
                 ?>

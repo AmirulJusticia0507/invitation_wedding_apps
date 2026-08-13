@@ -4,30 +4,40 @@ include 'koneksi.php';
 
 // Tambah story
 if (isset($_POST['simpan'])) {
-    $judul = $_POST['judul'];
-    $cerita = $_POST['cerita'];
+    csrf_verify();
+    $judul = trim($_POST['judul']);
+    $cerita = trim($_POST['cerita']);
     $tanggal = $_POST['tanggal'];
-    $pengantin_id = $_POST['pengantin_id'];
+    $pengantin_id = (int) $_POST['pengantin_id'];
 
-    $weddingku->query("INSERT INTO story (judul, cerita, tanggal, pengantin_id) VALUES ('$judul', '$cerita', '$tanggal', '$pengantin_id')");
+    $stmt = $weddingku->prepare("INSERT INTO story (judul, cerita, tanggal, pengantin_id) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("sssi", $judul, $cerita, $tanggal, $pengantin_id);
+    $stmt->execute();
     header('Location: story.php');
 }
 
 // Update story
 if (isset($_POST['update'])) {
-    $id = $_POST['id'];
-    $judul = $_POST['judul'];
-    $cerita = $_POST['cerita'];
+    csrf_verify();
+    $id = (int) $_POST['id'];
+    $judul = trim($_POST['judul']);
+    $cerita = trim($_POST['cerita']);
     $tanggal = $_POST['tanggal'];
-    $pengantin_id = $_POST['pengantin_id'];
+    $pengantin_id = (int) $_POST['pengantin_id'];
 
-    $weddingku->query("UPDATE story SET judul='$judul', cerita='$cerita', tanggal='$tanggal', pengantin_id='$pengantin_id' WHERE id=$id");
+    $stmt = $weddingku->prepare("UPDATE story SET judul=?, cerita=?, tanggal=?, pengantin_id=? WHERE id=?");
+    $stmt->bind_param("sssii", $judul, $cerita, $tanggal, $pengantin_id, $id);
+    $stmt->execute();
     header('Location: story.php');
 }
 
 // Hapus story
 if (isset($_GET['hapus'])) {
-    $id = $_GET['hapus'];
-    $weddingku->query("DELETE FROM story WHERE id=$id");
+    csrf_verify();
+    $id = (int) $_GET['hapus'];
+
+    $stmt = $weddingku->prepare("DELETE FROM story WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
     header('Location: story.php');
 }
