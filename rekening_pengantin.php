@@ -125,7 +125,15 @@
                     </select>
 
                     <input type="text" id="nomor_rekening" name="nomor_rekening" class="form-control mb-2" placeholder="Nomor Rekening" required>
-                    <input type="text" id="bank" name="bank" class="form-control mb-2" placeholder="Bank penerima" required autocomplete="off">
+                    <?php
+                    $bankListTambah = $weddingku->query("SELECT id, nama_bank FROM bank_list ORDER BY nama_bank");
+                    ?>
+                    <select name="bank_id" id="bank_id" class="form-control mb-2" required>
+                        <option value="">-- Pilih Bank --</option>
+                        <?php while ($b = $bankListTambah->fetch_assoc()) {
+                            echo "<option value='{$b['id']}'>{$b['nama_bank']}</option>";
+                        } ?>
+                    </select>
                     <div class="mb-3">
                         <label for="catatan" class="form-label">Atas Nama</label>
                         <input type="text" class="form-control" name="catatan" id="catatan" placeholder="Atas nama rekening" required>
@@ -166,51 +174,6 @@
                     next: "Berikutnya",
                     previous: "Sebelumnya"
                 },
-            }
-        });
-    });
-
-    $("#bank").autocomplete({
-        source: function(request, response) {
-            $.ajax({
-                url: "get_bank_codes.php",
-                type: "GET",
-                dataType: "json",
-                data: {
-                    term: request.term
-                },
-                success: function(data) {
-                    response(data);
-                }
-            });
-        },
-        minLength: 2,
-        select: function(event, ui) {
-            // Set kode bank yang dipilih ke input
-            $("#bank").val(ui.item.value); // Pastikan yang terpilih adalah kode_bank yang benar
-        }
-    });
-
-    $(document).ready(function() {
-        // Apply autocomplete for bank selection in the Edit modal
-        $("#editBank").autocomplete({
-            source: function(request, response) {
-                $.ajax({
-                    url: "get_bank_codes.php",
-                    type: "GET",
-                    dataType: "json",
-                    data: {
-                        term: request.term
-                    },
-                    success: function(data) {
-                        response(data);
-                    }
-                });
-            },
-            minLength: 2,
-            select: function(event, ui) {
-                // Set the selected bank id to the hidden input field (in case you need it)
-                $("#editBank").val(ui.item.value); // Update the bank name
             }
         });
     });

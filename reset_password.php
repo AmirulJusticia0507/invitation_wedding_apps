@@ -19,7 +19,7 @@
                     <div class="mb-3">
                         <label>Password Baru</label>
                         <div class="input-group">
-                            <input type="password" name="new_password" class="form-control" id="resetPassword" required>
+                            <input type="password" name="password" class="form-control" id="resetPassword" required>
                             <span class="input-group-text" onclick="togglePassword('resetPassword')">
                                 <i class="fas fa-eye"></i>
                             </span>

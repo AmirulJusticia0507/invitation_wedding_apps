@@ -23,7 +23,16 @@
         </br></br>
         <form action="import_tamu.php" method="POST" enctype="multipart/form-data" class="mb-3">
             <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-            <div class="input-group" style="max-width: 500px;">
+            <div class="input-group" style="max-width: 600px;">
+                <?php
+                $pengantinImportList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
+                ?>
+                <select name="pengantin_id" class="form-select" style="max-width: 250px;" required>
+                    <option value="">-- Pilih Pengantin --</option>
+                    <?php while ($p = $pengantinImportList->fetch_assoc()) {
+                        echo "<option value='{$p['id']}'>{$p['nama_pengantin']}</option>";
+                    } ?>
+                </select>
                 <input type="file" name="file_excel" class="form-control" accept=".xls,.xlsx" required>
                 <button type="submit" name="import" class="btn btn-success">
                     <i class="fa fa-upload"></i> Import Excel

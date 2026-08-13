@@ -3,6 +3,7 @@ include 'auth_check.php';
 include 'koneksi.php';
 
 if (isset($_POST['simpan'])) {
+    csrf_verify();
     $pengantin_id = $_POST['pengantin_id'];
     $nomor_rekening = $_POST['nomor_rekening'];
     $bank_id = $_POST['bank_id']; // Ambil bank_id dari form
@@ -32,6 +33,7 @@ if (isset($_POST['simpan'])) {
     }
 
 } elseif (isset($_POST['update'])) {
+    csrf_verify();
     $id = $_POST['id'];
     $pengantin_id = $_POST['pengantin_id'];
     $nomor_rekening = $_POST['nomor_rekening'];
@@ -62,6 +64,7 @@ if (isset($_POST['simpan'])) {
     }
 
 } elseif (isset($_GET['hapus'])) {
+    csrf_verify();
     $id = $_GET['hapus'];
     $stmt = $weddingku->prepare("DELETE FROM wedding_gift WHERE id = ?");
     $stmt->bind_param("i", $id);
