@@ -815,6 +815,52 @@ if (!empty($data['tanggal_akad']) && !empty($data['jam_akad'])) {
     navigator.serviceWorker.register("service-worker.js")
       .then((reg) => console.log("Service worker registered.", reg));
   }
+
+  // Initialize RSVP form
+  document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const selected = document.querySelector('input[name="rsvp"]:checked');
+    if (!selected) {
+      alert("Silakan pilih status kehadiran!");
+      return;
+    }
+    
+    const formData = new FormData(this);
+    fetch('undangan_url_action.php', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
+    })
+    .then(response => response.text())
+    .then(data => {
+      // Tutup section dan tampilkan status
+      document.getElementById('rsvpSection').style.display = 'none';
+      document.getElementById('rsvpStatus').style.display = 'block';
+      document.getElementById('rsvpStatusText').innerHTML = '<strong>' + data + '</strong>';
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert("Gagal menyimpan konfirmasi.");
+    });
+  });
+
+  // Cek status RSVP yang sudah ada dari database
+  (async function() {
+    try {
+      const res = await fetch('undangan_url_action.php?cek=1', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      const data = await res.text();
+      if (data && data !== 'belum diatur') {
+        document.getElementById('rsvpSection').style.display = 'none';
+        document.getElementById('rsvpStatus').style.display = 'block';
+        document.getElementById('rsvpStatusText').innerHTML = data;
+      }
+    } catch (e) {
+      console.log("Tidak bisa cek status RSVP");
+    }
+  })();
 </script>
 
 </body>
