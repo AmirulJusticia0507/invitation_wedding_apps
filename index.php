@@ -159,16 +159,16 @@ function formatTanggalIndo($date) {
 
 <!-- Sidebar Kanan -->
 <div class="slide-sidebar" id="slideSidebar">
-  <h4>Main Navigator</h4>
-  <ul>
-    <li><a href="#slide-1">Slide 1: Pembuka</a></li>
-    <li><a href="#slide-2">Slide 2: Save the Date</a></li>
-    <li><a href="#slide-3">Slide 3: Akad & Resepsi</a></li>
-    <li><a href="#slide-4">Slide 4: Our Story</a></li>
-    <li><a href="#slide-5">Slide 5: Gallery Foto</a></li>
-    <li><a href="#slide-6">Slide 6: Wedding Gift</a></li>
-    <li><a href="#slide-7">Slide 7: Ucapan & Do'a</a></li>
-  </ul>
+    <h4>Main Navigator</h4>
+    <ul>
+    <li><a href="javascript:void(0)" onclick="showSlide(1)">Slide 1: Pembuka</a></li>
+    <li><a href="javascript:void(0)" onclick="showSlide(2)">Slide 2: Save the Date</a></li>
+    <li><a href="javascript:void(0)" onclick="showSlide(3)">Slide 3: Akad & Resepsi</a></li>
+    <li><a href="javascript:void(0)" onclick="showSlide(4)">Slide 4: Our Story</a></li>
+    <li><a href="javascript:void(0)" onclick="showSlide(5)">Slide 5: Gallery Foto</a></li>
+    <li><a href="javascript:void(0)" onclick="showSlide(6)">Slide 6: Wedding Gift</a></li>
+    <li><a href="javascript:void(0)" onclick="showSlide(7)">Slide 7: Ucapan & Do'a</a></li>
+    </ul>
 </div>
 
 <!-- Slide 1 -->
@@ -641,10 +641,26 @@ if (!empty($data['tanggal_akad']) && !empty($data['jam_akad'])) {
   let currentSlide = 1;
   let storyIndex = 0;
 
+  function showSlide(n) {
+    // Sembunyikan semua slide
+    document.querySelectorAll(".slide").forEach(s => (s.style.display = "none"));
+    // Tampilkan slide yang dipilih
+    const target = document.getElementById(`slide-${n}`);
+    if (target) target.style.display = "block";
+    currentSlide = n;
+
+    // Reset "Our Story" carousel saat masuk ke slide-4
+    if (n === 4) {
+      const stories = document.querySelectorAll(".story-item");
+      stories.forEach(story => story.style.display = "none");
+      if (stories.length > 0) stories[0].style.display = "block";
+      storyIndex = 0;
+    }
+  }
+
   function openInvitation() {
     // Menampilkan slide berikutnya (misalnya ke slide 2)
-    document.getElementById('slide-1').style.display = 'none';
-    document.getElementById('slide-2').style.display = 'block';
+    showSlide(2);
 
     // Play audio
     var audio = document.getElementById('audioBackground');
