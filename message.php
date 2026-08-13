@@ -37,8 +37,8 @@
             $data = $weddingku->query("SELECT * FROM message");
             while ($row = $data->fetch_assoc()) {
                 echo "<tr>
-                    <td>{$row['nama']}</td>
-                    <td>{$row['pesan']}</td>
+                    <td>" . htmlspecialchars($row['nama']) . "</td>
+                    <td>" . htmlspecialchars($row['pesan']) . "</td>
                     <td>
                         <button class='btn btn-sm btn-warning' data-bs-toggle='modal' data-bs-target='#modalEditPesan{$row['id']}'>Edit</button>
                         <a href='" . csrf_url("message_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin hapus pesan ini?')\">Hapus</a>

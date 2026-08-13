@@ -58,18 +58,18 @@
             LEFT JOIN pengantin ON tamu.pengantin_id = pengantin.id
         ");
         
-            while ($row = $data->fetch_assoc()) {
+while ($row = $data->fetch_assoc()) {
                 echo "<tr>
-                    <td>{$row['nama_pengantin']}</td>
-                    <td>{$row['nama']}</td>
-                    <td>{$row['alamat']}</td>
+                    <td>" . htmlspecialchars($row['nama_pengantin']) . "</td>
+                    <td>" . htmlspecialchars($row['nama']) . "</td>
+                    <td>" . htmlspecialchars($row['alamat']) . "</td>
                     <td>
-                        <button class='btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1' data-bs-toggle='modal' data-bs-target='#modalEditTamu{$row['id']}'>
-                            <i class='fas fa-edit'></i> Edit
-                        </button>
-                    <a href='" . csrf_url("tamu_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1' onclick=\"return confirm('Yakin hapus data tamu?')\">
-                            <i class='fas fa-trash-alt'></i> Hapus
-                        </a>
+                         <button class='btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1' data-bs-toggle='modal' data-bs-target='#modalEditTamu{$row['id']}'>
+                             <i class='fas fa-edit'></i> Edit
+                         </button>
+                         <a href='" . csrf_url("tamu_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1' onclick=\"return confirm('Yakin hapus data tamu?')\">
+                             <i class='fas fa-trash-alt'></i> Hapus
+                         </a>
                     </td>
                 </tr>";
 

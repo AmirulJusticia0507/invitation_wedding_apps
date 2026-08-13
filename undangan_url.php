@@ -56,12 +56,12 @@
                     while ($tamu = $tamuQuery->fetch_assoc()) {
                         $tamuList[] = $tamu['nama'];
                     }
-                    $namaTamu = implode(", ", $tamuList); // Gabungkan nama tamu dengan koma
+                    $namaTamu = implode(", ", array_map('htmlspecialchars', $tamuList)); // Gabungkan nama tamu dengan koma
 
                     echo "<tr>
-                        <td nowrap>{$no}</td>
-                        <td nowrap>{$row['nama_pengantin']}</td>
-                        <td nowrap>{$namaTamu}</td>
+                        <td nowrap>" . htmlspecialchars($no) . "</td>
+                        <td nowrap>" . htmlspecialchars($row['nama_pengantin']) . "</td>
+                        <td nowrap>" . $namaTamu . "</td>
                         <td nowrap><a href='{$row['url_undangan']}' target='_blank'>{$row['url_undangan']}</a></td>
                         <td nowrap>
                             <button class='btn btn-sm btn-outline-warning' data-bs-toggle='modal' data-bs-target='#modalEditUndangan{$row['id']}'>

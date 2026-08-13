@@ -91,11 +91,11 @@
                     ORDER BY g.tanggal_upload DESC
                 ");            
                 while ($row = $data->fetch_assoc()) {
-                $nama_pengantin = $row['nama_pria'] . ' & ' . $row['nama_wanita'];
+                $nama_pengantin = htmlspecialchars($row['nama_pria'] . ' & ' . $row['nama_wanita']);
                 echo "
                     <tr>
                     <td>{$row['judul']}</td>
-                    <td><img src='assets/gallery/{$row['file']}' width='100'></td>
+                    <td><img src='assets/gallery/{$row['file']}' width='100' alt=''></td>
                     <td>$nama_pengantin</td>
                     <td>{$row['tanggal_upload']}</td>
                     <td>
