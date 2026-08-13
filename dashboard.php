@@ -337,6 +337,10 @@ $total_tamu = $weddingku->query("SELECT COUNT(*) as total FROM tamu")->fetch_ass
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
 <script>
+function esc(str) {
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 // Function to fetch and show guests in the modal
 function showGuests(pengantin_id) {
     // Use AJAX to fetch the guest data
@@ -354,8 +358,8 @@ function showGuests(pengantin_id) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${index + 1}</td>
-                    <td>${guest.nama}</td>
-                    <td>${guest.alamat}</td>
+                    <td>${esc(guest.nama)}</td>
+                    <td>${esc(guest.alamat)}</td>
                 `;
                 guestListBody.appendChild(row);
             });
@@ -386,9 +390,9 @@ function showUcapan(pengantin_id) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${index + 1}</td>
-                    <td>${ucapan.nama}</td>
-                    <td>${ucapan.pesan}</td>
-                    <td>${ucapan.created_at}</td>
+                    <td>${esc(ucapan.nama)}</td>
+                    <td>${esc(ucapan.pesan)}</td>
+                    <td>${esc(ucapan.created_at)}</td>
                 `;
                 ucapanListBody.appendChild(row);
             });

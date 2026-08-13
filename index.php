@@ -553,6 +553,15 @@ if (!empty($data['tanggal_akad']) && !empty($data['jam_akad'])) {
         isSwiping = false;
     });
 
+    function escapeHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     document.getElementById('ucapanForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -577,7 +586,7 @@ if (!empty($data['tanggal_akad']) && !empty($data['jam_akad'])) {
                     if (response === 'success') {
                         // Menampilkan ucapan baru di halaman
                         const li = document.createElement('li');
-                        li.innerHTML = `<strong>${nama}</strong>: ${isi}`;
+                        li.innerHTML = `<strong>${escapeHtml(nama)}</strong>: ${escapeHtml(isi)}`;
                         document.getElementById('listUcapan').prepend(li);
 
                         // Mengosongkan form input setelah ucapan berhasil ditambahkan
@@ -619,7 +628,7 @@ if (!empty($data['tanggal_akad']) && !empty($data['jam_akad'])) {
         data.forEach((item) => {
           const li = document.createElement("li");
           li.className = "mb-3 p-2 bg-white text-dark rounded shadow-sm";
-          li.innerHTML = `<strong>${item.nama}:</strong> <br> ${item.pesan}`;
+          li.innerHTML = `<strong>${escapeHtml(item.nama)}:</strong> <br> ${escapeHtml(item.pesan)}`;
           list.appendChild(li);
         });
       })
@@ -776,7 +785,7 @@ if (!empty($data['tanggal_akad']) && !empty($data['jam_akad'])) {
   }
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/service-worker.js")
+    navigator.serviceWorker.register("service-worker.js")
       .then((reg) => console.log("Service worker registered.", reg));
   }
 </script>

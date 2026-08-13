@@ -15,7 +15,7 @@
             <div class="card p-4">
                 <h4 class="text-center mb-4">Reset Password</h4>
                 <form action="auth_reset_password.php" method="POST">
-                    <input type="hidden" name="token" value="<?= $_GET['token'] ?? '' ?>">
+                    <input type="hidden" name="token" value="<?= htmlspecialchars($_GET['token'] ?? '', ENT_QUOTES) ?>">
                     <div class="mb-3">
                         <label>Password Baru</label>
                         <div class="input-group">
