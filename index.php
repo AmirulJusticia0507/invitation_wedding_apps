@@ -129,7 +129,7 @@ function formatTanggalIndo($date) {
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="auto">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -153,9 +153,20 @@ function formatTanggalIndo($date) {
 <body>
 
 <!-- Toggle Button -->
-<button id="toggleSidebar" class="sidebar-toggle">
-  ☰ Menu Wedding Invitation
+<button id="toggleSidebar" class="sidebar-toggle" onclick="toggleDarkMode()">
+   ☰ Menu Wedding Invitation
 </button>
+
+<script>
+function toggleDarkMode() {
+    const html = document.documentElement;
+    if (html.getAttribute('data-bs-theme') === 'dark') {
+        html.setAttribute('data-bs-theme', 'auto');
+    } else {
+        html.setAttribute('data-bs-theme', 'dark');
+    }
+}
+</script>
 
 <!-- Sidebar Kanan -->
 <div class="slide-sidebar" id="slideSidebar">
