@@ -5,12 +5,12 @@ include 'koneksi.php';
 // Tambah pesan
 if (isset($_POST['simpan'])) {
     csrf_verify();
-    $nama_pengirim = $_POST['nama_pengirim'];
-    $isi_pesan = $_POST['isi_pesan'];
+    $nama = $_POST['nama_pengirim'];
+    $pesan = $_POST['isi_pesan'];
     $pengantin_id = (int) $_POST['pengantin_id'];
 
-    $stmt = $weddingku->prepare("INSERT INTO message (nama_pengirim, isi_pesan, pengantin_id) VALUES (?, ?, ?)");
-    $stmt->bind_param("ssi", $nama_pengirim, $isi_pesan, $pengantin_id);
+    $stmt = $weddingku->prepare("INSERT INTO message (nama, pesan, pengantin_id) VALUES (?, ?, ?)");
+    $stmt->bind_param("ssi", $nama, $pesan, $pengantin_id);
     $stmt->execute();
     $stmt->close();
 
@@ -22,12 +22,12 @@ if (isset($_POST['simpan'])) {
 if (isset($_POST['update'])) {
     csrf_verify();
     $id = (int) $_POST['id'];
-    $nama_pengirim = $_POST['nama_pengirim'];
-    $isi_pesan = $_POST['isi_pesan'];
+    $nama = $_POST['nama_pengirim'];
+    $pesan = $_POST['isi_pesan'];
     $pengantin_id = (int) $_POST['pengantin_id'];
 
-    $stmt = $weddingku->prepare("UPDATE message SET nama_pengirim=?, isi_pesan=?, pengantin_id=? WHERE id=?");
-    $stmt->bind_param("ssii", $nama_pengirim, $isi_pesan, $pengantin_id, $id);
+    $stmt = $weddingku->prepare("UPDATE message SET nama=?, pesan=?, pengantin_id=? WHERE id=?");
+    $stmt->bind_param("ssii", $nama, $pesan, $pengantin_id, $id);
     $stmt->execute();
     $stmt->close();
 

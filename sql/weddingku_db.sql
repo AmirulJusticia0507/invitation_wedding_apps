@@ -191,6 +191,7 @@ CREATE TABLE `undangan_url` (
   `tamu_id` int NOT NULL,
   `encrypted_token` varchar(255) NOT NULL,
   `url_undangan` text,
+  `status_rsvp` enum('belum','hadir','tidak_hadir') DEFAULT 'belum',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -248,6 +249,58 @@ CREATE TABLE `wedding_gift` (
 
 insert  into `wedding_gift`(`id`,`pengantin_id`,`bank_id`,`nama_penerima`,`nomor_rekening`,`catatan`,`created_at`) values 
 (1,1,3,NULL,'1795464186','Arisa Chandra Pusparini','2025-04-14 10:32:15');
+
+/*Table structure for table `log_akses_undangan` */
+
+DROP TABLE IF EXISTS `log_akses_undangan`;
+
+CREATE TABLE `log_akses_undangan` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `undangan_url_id` int NOT NULL,
+  `tamu_id` int DEFAULT NULL,
+  `user_agent` text,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `accessed_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `undangan_url_id` (`undangan_url_id`),
+  KEY `tamu_id` (`tamu_id`),
+  CONSTRAINT `log_akses_undangan_ibfk_1` FOREIGN KEY (`undangan_url_id`) REFERENCES `undangan_url` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `log_akses_undangan_ibfk_2` FOREIGN KEY (`tamu_id`) REFERENCES `tamu` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+/*Data for the table `log_akses_undangan` */
+
+/*Table structure for table `password_resets` */
+
+DROP TABLE IF EXISTS `password_resets`;
+
+CREATE TABLE `password_resets` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+/*Data for the table `password_resets` */
+
+/*Table structure for table `folders` */
+
+DROP TABLE IF EXISTS `folders`;
+
+CREATE TABLE `folders` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nama_folder` varchar(255) NOT NULL,
+  `deskripsi` text,
+  `pengantin_id` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `pengantin_id` (`pengantin_id`),
+  CONSTRAINT `folders_ibfk_1` FOREIGN KEY (`pengantin_id`) REFERENCES `pengantin` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+/*Data for the table `folders` */
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

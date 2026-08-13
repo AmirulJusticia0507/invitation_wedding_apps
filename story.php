@@ -23,9 +23,9 @@
         <table class="table table-bordered table-striped table-hover display" style="width:100%" nowrap id="tabelStory">
             <thead>
                 <tr>
-                    <th>Judul</th>
-                    <th>Cerita</th>
-                    <th>Tanggal</th>
+                    <th>Bulan</th>
+                    <th>Tahun</th>
+                    <th>Deskripsi</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -37,9 +37,9 @@
             
             while ($row = $data->fetch_assoc()) {
                 echo "<tr>
-                    <td>{$row['judul']}</td>
-                    <td>{$row['cerita']}</td>
-                    <td>{$row['tanggal']}</td>
+                    <td>{$row['bulan']}</td>
+                    <td>{$row['tahun']}</td>
+                    <td>{$row['deskripsi']}</td>
                     <td>
                         <button class='btn btn-sm btn-warning' data-bs-toggle='modal' data-bs-target='#modalEditStory{$row['id']}'>Edit</button>
                         <a href='" . csrf_url("story_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin ingin menghapus cerita ini?')\">Hapus</a>
@@ -64,9 +64,9 @@
                                                 echo "<option value='{$p['id']}' $selected>{$p['nama_pengantin']}</option>";
                                             }
                                     echo "  </select>
-                                    <input type='text' name='judul' class='form-control mb-2' value='{$row['judul']}' required>
-                                    <textarea name='cerita' class='form-control mb-2'>{$row['cerita']}</textarea>
-                                    <input type='date' name='tanggal' class='form-control mb-2' value='{$row['tanggal']}' required>
+                                    <input type='text' name='bulan' class='form-control mb-2' value='{$row['bulan']}' placeholder='Bulan (contoh: Januari)' required>
+                                    <input type='number' name='tahun' class='form-control mb-2' value='{$row['tahun']}' placeholder='Tahun (contoh: 2024)' required>
+                                    <textarea name='deskripsi' class='form-control mb-2' placeholder='Cerita singkat'>{$row['deskripsi']}</textarea>
                                 </div>
                                 <div class='modal-footer'>
                                     <button type='submit' name='update' class='btn btn-warning text-dark rounded-pill px-4'>
@@ -104,9 +104,9 @@
                         }
                         ?>
                     </select>
-                    <input type="text" name="judul" class="form-control mb-2" placeholder="Judul Cerita" required>
-                    <textarea name="cerita" class="form-control mb-2" placeholder="Isi Cerita" required></textarea>
-                    <input type="date" name="tanggal" class="form-control mb-2" required>
+                    <input type="text" name="bulan" class="form-control mb-2" placeholder="Bulan (contoh: Januari)" required>
+                    <input type="number" name="tahun" class="form-control mb-2" placeholder="Tahun (contoh: 2024)" required>
+                    <textarea name="deskripsi" class="form-control mb-2" placeholder="Cerita singkat" required></textarea>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" name="simpan" class="btn btn-pink text-blue rounded-pill px-4">
