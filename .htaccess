@@ -1,0 +1,22 @@
+# Apache Security
+
+# SQL folder eript access
+<filesmatch "?(.htaccess|.db|*.sql)">
+Order Allow,Deny
+Deny from all
+</filesmatch>
+
+# Protect config and sensitive files
+<filesmatch "?(php|ini|conf|env|lock|pid)">
+Order Allow,Deny
+Deny from all
+</filesmatch>
+
+# Disable directory listing
+Options -Indexes
+
+# Basic rewrite rules (optional)
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]

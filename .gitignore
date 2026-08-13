@@ -1,0 +1,21 @@
+# PHP 프로젝트 ignore
+/vendor/
+/vendor/.*
+/composer.lock
+/.phpunit/
+/*.twig
+/.behat
+/uploads/
+/assets/gallery/
+/*.db
+/*.sqlite
+/.DS_Store
+
+# IDE
+/.idea/
+/*.swp
+/vscode/
+
+# Laragon
+/tmp/
+/*.temp
