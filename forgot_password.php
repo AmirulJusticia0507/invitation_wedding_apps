@@ -47,7 +47,7 @@
             <div class="flex items-start gap-3 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-6">
                 <i class="fa-solid fa-circle-info text-blue-400 text-sm mt-0.5 flex-shrink-0"></i>
                 <p class="text-blue-300 text-xs leading-relaxed">
-                    Masukkan email yang terdaftar. Token reset akan ditampilkan dan kamu bisa langsung reset password.
+                    Masukkan email akun Anda. Token reset akan langsung dibuat untuk mengubah password.
                 </p>
             </div>
 
@@ -58,7 +58,7 @@
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                             <i class="fa-solid fa-envelope text-slate-500 text-sm"></i>
                         </div>
-                        <input type="email" name="email" id="emailInput" required placeholder="admin@example.com"
+                        <input type="email" name="email" id="emailInput" required placeholder="admin@gmail.com"
                                class="w-full bg-slate-800/60 border border-slate-700 text-white placeholder-slate-500
                                       rounded-xl pl-10 pr-4 py-3 text-sm
                                       focus:outline-none focus:border-blue-500/60 input-focus transition duration-200">
@@ -119,7 +119,13 @@ document.getElementById('forgotForm').addEventListener('submit', async function(
 
     try {
         const res  = await fetch('auth_forgot_password.php', { method: 'POST', body: data });
-        const json = await res.json();
+        const text = await res.text();
+        let json;
+        try {
+            json = JSON.parse(text);
+        } catch (err) {
+            throw new Error(text || 'Respon server tidak valid');
+        }
 
         if (json.status === 'success') {
             document.getElementById('tokenValue').textContent = json.token;
@@ -129,8 +135,8 @@ document.getElementById('forgotForm').addEventListener('submit', async function(
             Swal.fire({ icon: 'error', title: 'Gagal', text: json.message,
                 background: '#0f172a', color: '#f1f5f9', confirmButtonColor: '#3b82f6' });
         }
-    } catch {
-        Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan.',
+    } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Terjadi kesalahan.',
             background: '#0f172a', color: '#f1f5f9', confirmButtonColor: '#3b82f6' });
     }
 
