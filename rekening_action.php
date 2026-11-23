@@ -2,76 +2,97 @@
 include 'auth_check.php';
 include 'koneksi.php';
 
+// SIMPAN REKENING
 if (isset($_POST['simpan'])) {
     csrf_verify();
-    $pengantin_id = $_POST['pengantin_id'];
-    $nomor_rekening = $_POST['nomor_rekening'];
-    $bank_id = $_POST['bank_id']; // Ambil bank_id dari form
-    $catatan = $_POST['catatan'];
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
+    $nomor_rekening = trim($_POST['nomor_rekening'] ?? '');
+    $bank_id = (int) ($_POST['bank_id'] ?? 0);
+    $catatan = trim($_POST['catatan'] ?? '');
 
-    // Periksa apakah bank_id valid
-    $stmt = $weddingku->prepare("SELECT id FROM bank_list WHERE id = ?");
-    $stmt->bind_param("i", $bank_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $bank = $result->fetch_assoc();
+    if ($pengantin_id <= 0 || empty($nomor_rekening) || $bank_id <= 0) {
+        header("Location: rekening_pengantin.php?error=" . urlencode("Pengantin, nomor rekening, dan bank wajib diisi."));
+        exit;
+    }
 
-    if ($bank) {
-        // Simpan data ke wedding_gift
-        $query = $weddingku->prepare("INSERT INTO wedding_gift (pengantin_id, nomor_rekening, bank_id, catatan) VALUES (?, ?, ?, ?)");
-        $query->bind_param("isis", $pengantin_id, $nomor_rekening, $bank_id, $catatan);
+    try {
+        // Periksa apakah bank_id valid
+        $stmt_b = $weddingku->prepare("SELECT id FROM bank_list WHERE id = ?");
+        $stmt_b->bind_param("i", $bank_id);
+        $stmt_b->execute();
+        if ($stmt_b->get_result()->num_rows === 0) {
+            header("Location: rekening_pengantin.php?error=" . urlencode("Bank yang dipilih tidak valid."));
+            exit;
+        }
+
+        // Simpan data ke wedding_gift (isi nama_penerima dan catatan)
+        $query = $weddingku->prepare("INSERT INTO wedding_gift (pengantin_id, bank_id, nama_penerima, nomor_rekening, catatan) VALUES (?, ?, ?, ?, ?)");
+        $query->bind_param("iisss", $pengantin_id, $bank_id, $catatan, $nomor_rekening, $catatan);
         $query->execute();
 
-        if ($query->affected_rows > 0) {
-            header("Location: rekening_pengantin.php");
-            exit;
-        } else {
-            echo "Gagal menyimpan data rekening!";
-        }
-    } else {
-        echo "Bank tidak ditemukan!";
+        header("Location: rekening_pengantin.php?msg=saved");
+        exit;
+    } catch (Throwable $e) {
+        header("Location: rekening_pengantin.php?error=" . urlencode("Gagal menyimpan data rekening: " . $e->getMessage()));
+        exit;
     }
 
 } elseif (isset($_POST['update'])) {
     csrf_verify();
-    $id = $_POST['id'];
-    $pengantin_id = $_POST['pengantin_id'];
-    $nomor_rekening = $_POST['nomor_rekening'];
-    $bank_id = $_POST['bank_id']; // Ambil bank_id dari form
-    $catatan = $_POST['catatan'];
+    $id = (int) ($_POST['id'] ?? 0);
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
+    $nomor_rekening = trim($_POST['nomor_rekening'] ?? '');
+    $bank_id = (int) ($_POST['bank_id'] ?? 0);
+    $catatan = trim($_POST['catatan'] ?? '');
 
-    // Periksa apakah bank_id valid
-    $stmt = $weddingku->prepare("SELECT id FROM bank_list WHERE id = ?");
-    $stmt->bind_param("i", $bank_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $bank = $result->fetch_assoc();
+    if ($id <= 0 || $pengantin_id <= 0 || empty($nomor_rekening) || $bank_id <= 0) {
+        header("Location: rekening_pengantin.php?error=" . urlencode("Data rekening tidak valid atau belum lengkap."));
+        exit;
+    }
 
-    if ($bank) {
-        // Update data rekening
-        $query = $weddingku->prepare("UPDATE wedding_gift SET pengantin_id = ?, nomor_rekening = ?, bank_id = ?, catatan = ? WHERE id = ?");
-        $query->bind_param("isisi", $pengantin_id, $nomor_rekening, $bank_id, $catatan, $id);
+    try {
+        // Periksa apakah bank_id valid
+        $stmt_b = $weddingku->prepare("SELECT id FROM bank_list WHERE id = ?");
+        $stmt_b->bind_param("i", $bank_id);
+        $stmt_b->execute();
+        if ($stmt_b->get_result()->num_rows === 0) {
+            header("Location: rekening_pengantin.php?error=" . urlencode("Bank yang dipilih tidak valid."));
+            exit;
+        }
+
+        // Update data rekening (isi nama_penerima dan catatan)
+        $query = $weddingku->prepare("UPDATE wedding_gift SET pengantin_id = ?, bank_id = ?, nama_penerima = ?, nomor_rekening = ?, catatan = ? WHERE id = ?");
+        $query->bind_param("iisssi", $pengantin_id, $bank_id, $catatan, $nomor_rekening, $catatan, $id);
         $query->execute();
 
-        if ($query->affected_rows > 0) {
-            header("Location: rekening_pengantin.php");
-            exit;
-        } else {
-            echo "Gagal mengupdate data rekening!";
-        }
-    } else {
-        echo "Bank tidak ditemukan!";
+        header("Location: rekening_pengantin.php?msg=updated");
+        exit;
+    } catch (Throwable $e) {
+        header("Location: rekening_pengantin.php?error=" . urlencode("Gagal memperbarui data rekening: " . $e->getMessage()));
+        exit;
     }
 
 } elseif (isset($_GET['hapus'])) {
     csrf_verify();
-    $id = $_GET['hapus'];
-    $stmt = $weddingku->prepare("DELETE FROM wedding_gift WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
+    $id = (int) ($_GET['hapus'] ?? 0);
 
-    header("Location: rekening_pengantin.php");
-    exit;
+    if ($id <= 0) {
+        header("Location: rekening_pengantin.php?error=" . urlencode("ID rekening tidak valid."));
+        exit;
+    }
+
+    try {
+        $stmt = $weddingku->prepare("DELETE FROM wedding_gift WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        header("Location: rekening_pengantin.php?msg=deleted");
+        exit;
+    } catch (Throwable $e) {
+        header("Location: rekening_pengantin.php?error=" . urlencode("Gagal menghapus data rekening: " . $e->getMessage()));
+        exit;
+    }
 }
 
-?>
+header("Location: rekening_pengantin.php");
+exit;

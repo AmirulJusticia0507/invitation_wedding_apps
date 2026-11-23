@@ -2,50 +2,88 @@
 include 'auth_check.php';
 include 'koneksi.php';
 
-// Tambah pesan
+// TAMBAH PESAN
 if (isset($_POST['simpan'])) {
     csrf_verify();
-    $nama = $_POST['nama_pengirim'];
-    $pesan = $_POST['isi_pesan'];
-    $pengantin_id = (int) $_POST['pengantin_id'];
+    $nama = trim($_POST['nama_pengirim'] ?? '');
+    $pesan = trim($_POST['isi_pesan'] ?? '');
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
 
-    $stmt = $weddingku->prepare("INSERT INTO message (nama, pesan, pengantin_id) VALUES (?, ?, ?)");
-    $stmt->bind_param("ssi", $nama, $pesan, $pengantin_id);
-    $stmt->execute();
-    $stmt->close();
+    if ($nama === '' || $pesan === '' || $pengantin_id <= 0) {
+        header('Location: message.php?error=' . urlencode("Nama pengirim, ucapan, dan pasangan pengantin wajib diisi."));
+        exit;
+    }
 
-    header('Location: message.php');
-    exit;
+    try {
+        $stmt = $weddingku->prepare("INSERT INTO message (nama, pesan, pengantin_id) VALUES (?, ?, ?)");
+        $stmt->bind_param("ssi", $nama, $pesan, $pengantin_id);
+        $stmt->execute();
+        $stmt->close();
+
+        header('Location: message.php?msg=saved');
+        exit;
+    } catch (Throwable $e) {
+        header('Location: message.php?error=' . urlencode("Gagal menyimpan pesan: " . $e->getMessage()));
+        exit;
+    }
 }
 
-// Update pesan
+// UPDATE PESAN
 if (isset($_POST['update'])) {
     csrf_verify();
-    $id = (int) $_POST['id'];
-    $nama = $_POST['nama_pengirim'];
-    $pesan = $_POST['isi_pesan'];
-    $pengantin_id = (int) $_POST['pengantin_id'];
+    $id = (int) ($_POST['id'] ?? 0);
+    $nama = trim($_POST['nama_pengirim'] ?? '');
+    $pesan = trim($_POST['isi_pesan'] ?? '');
+    $pengantin_id = isset($_POST['pengantin_id']) ? (int) $_POST['pengantin_id'] : 0;
 
-    $stmt = $weddingku->prepare("UPDATE message SET nama=?, pesan=?, pengantin_id=? WHERE id=?");
-    $stmt->bind_param("ssii", $nama, $pesan, $pengantin_id, $id);
-    $stmt->execute();
-    $stmt->close();
+    if ($id <= 0 || $nama === '' || $pesan === '') {
+        header('Location: message.php?error=' . urlencode("Data pesan tidak valid atau belum lengkap."));
+        exit;
+    }
 
-    header('Location: message.php');
-    exit;
+    try {
+        if ($pengantin_id > 0) {
+            $stmt = $weddingku->prepare("UPDATE message SET nama=?, pesan=?, pengantin_id=? WHERE id=?");
+            $stmt->bind_param("ssii", $nama, $pesan, $pengantin_id, $id);
+        } else {
+            $stmt = $weddingku->prepare("UPDATE message SET nama=?, pesan=? WHERE id=?");
+            $stmt->bind_param("ssi", $nama, $pesan, $id);
+        }
+
+        $stmt->execute();
+        $stmt->close();
+
+        header('Location: message.php?msg=updated');
+        exit;
+    } catch (Throwable $e) {
+        header('Location: message.php?error=' . urlencode("Gagal memperbarui pesan: " . $e->getMessage()));
+        exit;
+    }
 }
 
-// Hapus pesan
+// HAPUS PESAN
 if (isset($_GET['hapus'])) {
     csrf_verify();
-    $id = (int) $_GET['hapus'];
+    $id = (int) ($_GET['hapus'] ?? 0);
 
-    $stmt = $weddingku->prepare("DELETE FROM message WHERE id=?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->close();
+    if ($id <= 0) {
+        header('Location: message.php?error=' . urlencode("ID pesan tidak valid."));
+        exit;
+    }
 
-    header('Location: message.php');
-    exit;
+    try {
+        $stmt = $weddingku->prepare("DELETE FROM message WHERE id=?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+
+        header('Location: message.php?msg=deleted');
+        exit;
+    } catch (Throwable $e) {
+        header('Location: message.php?error=' . urlencode("Gagal menghapus pesan: " . $e->getMessage()));
+        exit;
+    }
 }
-?>
+
+header('Location: message.php');
+exit;

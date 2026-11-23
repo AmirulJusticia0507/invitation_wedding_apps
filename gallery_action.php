@@ -3,113 +3,206 @@ include 'auth_check.php';
 include 'koneksi.php';
 
 $upload_dir = 'assets/gallery/';
-$allowed_extensions = array('jpg', 'jpeg', 'png', 'gif');
-$pengantin_id = isset($_POST['pengantin_id']) ? (int) $_POST['pengantin_id'] : 0;
+if (!is_dir($upload_dir)) {
+    mkdir($upload_dir, 0755, true);
+}
 
-// Tambah Foto
-if (isset($_POST['simpan'])) {
-    csrf_verify();
-    $judul = trim($_POST['judul']);
-    $namaFile = $_FILES['file']['name'];
-    $tmpFile = $_FILES['file']['tmp_name'];
-    $ext = strtolower(pathinfo($namaFile, PATHINFO_EXTENSION));
+$allowed_extensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
 
-    if (in_array($ext, $allowed_extensions) && is_uploaded_file($tmpFile)) {
-        // Path frame PNG
-        $framePath = 'images/green_frame_transparent.png';
+function processAndSaveImage($tmpFile, $origName, $upload_dir) {
+    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+    $namaBaru = time() . '_' . uniqid() . '.' . $ext;
+    $savePath = $upload_dir . $namaBaru;
 
-        // Load frame PNG
-        $frame = @imagecreatefrompng($framePath);
-        if ($frame) {
-            imagealphablending($frame, true);
-            imagesavealpha($frame, true);
+    // Cek apakah GD tersedia dan frame ada
+    $framePath = 'images/green_frame_transparent.png';
+    $useFrame = function_exists('imagecreatefrompng') && file_exists($framePath);
 
-            // Load gambar upload sesuai ekstensi
-            switch ($ext) {
-                case 'jpg':
-                case 'jpeg':
-                    $uploaded = @imagecreatefromjpeg($tmpFile);
-                    break;
-                case 'png':
-                    $uploaded = @imagecreatefrompng($tmpFile);
-                    break;
-                case 'gif':
-                    $uploaded = @imagecreatefromgif($tmpFile);
-                    break;
-                default:
-                    $uploaded = false;
+    if ($useFrame) {
+        try {
+            $frame = @imagecreatefrompng($framePath);
+            if ($frame) {
+                imagealphablending($frame, true);
+                imagesavealpha($frame, true);
+
+                $uploaded = false;
+                switch ($ext) {
+                    case 'jpg':
+                    case 'jpeg':
+                        $uploaded = @imagecreatefromjpeg($tmpFile);
+                        break;
+                    case 'png':
+                        $uploaded = @imagecreatefrompng($tmpFile);
+                        break;
+                    case 'gif':
+                        $uploaded = @imagecreatefromgif($tmpFile);
+                        break;
+                    case 'webp':
+                        if (function_exists('imagecreatefromwebp')) {
+                            $uploaded = @imagecreatefromwebp($tmpFile);
+                        }
+                        break;
+                }
+
+                if ($uploaded) {
+                    $w = imagesx($frame);
+                    $h = imagesy($frame);
+                    $resized = imagescale($uploaded, $w, $h);
+                    if ($resized) {
+                        imagecopy($resized, $frame, 0, 0, 0, 0, $w, $h);
+                        imagepng($resized, $savePath);
+                        imagedestroy($resized);
+                        imagedestroy($uploaded);
+                        imagedestroy($frame);
+                        return $namaBaru;
+                    }
+                    imagedestroy($uploaded);
+                }
+                imagedestroy($frame);
             }
-
-            if ($uploaded) {
-                // Resize agar pas dengan ukuran frame
-                $uploaded = imagescale($uploaded, imagesx($frame), imagesy($frame));
-
-                // Gabungkan frame ke gambar
-                imagecopy($uploaded, $frame, 0, 0, 0, 0, imagesx($frame), imagesy($frame));
-
-                // Simpan hasil akhir
-                $namaBaru = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $namaFile);
-                $savePath = $upload_dir . $namaBaru;
-                imagepng($uploaded, $savePath);
-
-                // Simpan ke database
-                $stmt = $weddingku->prepare("INSERT INTO gallery (judul, file, pengantin_id) VALUES (?, ?, ?)");
-                $stmt->bind_param("ssi", $judul, $namaBaru, $pengantin_id);
-                $stmt->execute();
-
-                // Bersihkan memori
-                imagedestroy($uploaded);
-            }
-            imagedestroy($frame);
+        } catch (Throwable $t) {
+            // Jika pemrosesan GD gagal (misal Out of Memory), fallback ke upload biasa
         }
     }
 
-    header('Location: gallery.php');
-    exit();
+    // Fallback: simpan langsung file aslinya
+    if (move_uploaded_file($tmpFile, $savePath)) {
+        return $namaBaru;
+    }
+    return false;
 }
 
-// Update Foto
+// TAMBAH FOTO
+if (isset($_POST['simpan'])) {
+    csrf_verify();
+    $judul = trim($_POST['judul'] ?? '');
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
+    $namaFile = $_FILES['file']['name'] ?? '';
+    $tmpFile = $_FILES['file']['tmp_name'] ?? '';
+    $ext = strtolower(pathinfo($namaFile, PATHINFO_EXTENSION));
+
+    if ($judul === '' || $pengantin_id <= 0 || empty($namaFile)) {
+        header('Location: gallery.php?error=' . urlencode("Judul, pasangan pengantin, dan file foto wajib diisi."));
+        exit;
+    }
+
+    if (!in_array($ext, $allowed_extensions) || !is_uploaded_file($tmpFile)) {
+        header('Location: gallery.php?error=' . urlencode("Format file tidak didukung. Format harus JPG, JPEG, PNG, GIF, atau WebP."));
+        exit;
+    }
+
+    try {
+        $savedFile = processAndSaveImage($tmpFile, $namaFile, $upload_dir);
+        if (!$savedFile) {
+            header('Location: gallery.php?error=' . urlencode("Gagal menyimpan foto ke server."));
+            exit;
+        }
+
+        $stmt = $weddingku->prepare("INSERT INTO gallery (judul, file, pengantin_id) VALUES (?, ?, ?)");
+        $stmt->bind_param("ssi", $judul, $savedFile, $pengantin_id);
+        $stmt->execute();
+        $stmt->close();
+
+        header('Location: gallery.php?msg=saved');
+        exit;
+    } catch (Throwable $e) {
+        header('Location: gallery.php?error=' . urlencode("Gagal menyimpan galeri: " . $e->getMessage()));
+        exit;
+    }
+}
+
+// UPDATE FOTO
 if (isset($_POST['update'])) {
     csrf_verify();
-    $id = (int) $_POST['id'];
-    $judul = trim($_POST['judul']);
-    $file = $_FILES['file']['name'];
-    $tmp = $_FILES['file']['tmp_name'];
-    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+    $id = (int) ($_POST['id'] ?? 0);
+    $judul = trim($_POST['judul'] ?? '');
+    $pengantin_id = isset($_POST['pengantin_id']) ? (int) $_POST['pengantin_id'] : 0;
+    $namaFile = $_FILES['file']['name'] ?? '';
+    $tmpFile = $_FILES['file']['tmp_name'] ?? '';
 
-    if (!empty($file) && in_array($ext, $allowed_extensions) && is_uploaded_file($tmp)) {
-        $namaBaru = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file);
-        move_uploaded_file($tmp, $upload_dir . $namaBaru);
-        $stmt = $weddingku->prepare("UPDATE gallery SET judul=?, file=? WHERE id=?");
-        $stmt->bind_param("ssi", $judul, $namaBaru, $id);
-        $stmt->execute();
-    } else {
-        $stmt = $weddingku->prepare("UPDATE gallery SET judul=? WHERE id=?");
-        $stmt->bind_param("si", $judul, $id);
-        $stmt->execute();
+    if ($id <= 0 || $judul === '') {
+        header('Location: gallery.php?error=' . urlencode("Data foto tidak valid."));
+        exit;
     }
 
-    header('Location: gallery.php');
-    exit();
+    try {
+        // Ambil data foto lama
+        $stmt_old = $weddingku->prepare("SELECT file, pengantin_id FROM gallery WHERE id=?");
+        $stmt_old->bind_param("i", $id);
+        $stmt_old->execute();
+        $old = $stmt_old->get_result()->fetch_assoc();
+        $oldFile = $old['file'] ?? '';
+        $final_pengantin_id = $pengantin_id > 0 ? $pengantin_id : ($old['pengantin_id'] ?? null);
+
+        if (!empty($namaFile) && is_uploaded_file($tmpFile)) {
+            $ext = strtolower(pathinfo($namaFile, PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowed_extensions)) {
+                header('Location: gallery.php?error=' . urlencode("Format file foto tidak didukung."));
+                exit;
+            }
+
+            $savedFile = processAndSaveImage($tmpFile, $namaFile, $upload_dir);
+            if (!$savedFile) {
+                header('Location: gallery.php?error=' . urlencode("Gagal mengupload file foto baru."));
+                exit;
+            }
+
+            // Hapus file lama jika ada
+            if ($oldFile && file_exists($upload_dir . $oldFile)) {
+                @unlink($upload_dir . $oldFile);
+            }
+
+            $stmt = $weddingku->prepare("UPDATE gallery SET judul=?, file=?, pengantin_id=? WHERE id=?");
+            $stmt->bind_param("ssii", $judul, $savedFile, $final_pengantin_id, $id);
+        } else {
+            $stmt = $weddingku->prepare("UPDATE gallery SET judul=?, pengantin_id=? WHERE id=?");
+            $stmt->bind_param("sii", $judul, $final_pengantin_id, $id);
+        }
+
+        $stmt->execute();
+        $stmt->close();
+
+        header('Location: gallery.php?msg=updated');
+        exit;
+    } catch (Throwable $e) {
+        header('Location: gallery.php?error=' . urlencode("Gagal memperbarui foto: " . $e->getMessage()));
+        exit;
+    }
 }
 
-// Hapus Foto
+// HAPUS FOTO
 if (isset($_GET['hapus'])) {
     csrf_verify();
-    $id = (int) $_GET['hapus'];
-    $stmt = $weddingku->prepare("SELECT file FROM gallery WHERE id=?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $foto = $result->fetch_assoc()['file'] ?? null;
+    $id = (int) ($_GET['hapus'] ?? 0);
 
-    if ($foto && file_exists($upload_dir . $foto)) {
-        unlink($upload_dir . $foto);
+    if ($id <= 0) {
+        header('Location: gallery.php?error=' . urlencode("ID foto tidak valid."));
+        exit;
     }
 
-    $stmt = $weddingku->prepare("DELETE FROM gallery WHERE id=?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    header('Location: gallery.php');
-    exit();
+    try {
+        $stmt = $weddingku->prepare("SELECT file FROM gallery WHERE id=?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $foto = $result->fetch_assoc()['file'] ?? null;
+
+        if ($foto && file_exists($upload_dir . $foto)) {
+            @unlink($upload_dir . $foto);
+        }
+
+        $stmt = $weddingku->prepare("DELETE FROM gallery WHERE id=?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+
+        header('Location: gallery.php?msg=deleted');
+        exit;
+    } catch (Throwable $e) {
+        header('Location: gallery.php?error=' . urlencode("Gagal menghapus foto: " . $e->getMessage()));
+        exit;
+    }
 }
+
+header('Location: gallery.php');
+exit;

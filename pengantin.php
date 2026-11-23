@@ -51,6 +51,7 @@
                     <tbody>
                     <?php
                     $upload_dir = 'uploads/';
+                    $modals = '';
                     $data = $weddingku->query("SELECT * FROM pengantin");
                     while ($row = $data->fetch_assoc()) {
                         $priaImg = !empty($row['foto_pria']) ? "{$upload_dir}{$row['foto_pria']}" : "images/istockphoto-487583818-1024x1024.jpg";
@@ -96,8 +97,8 @@
                             </td>
                         </tr>";
 
-                        // Modal Edit
-                        echo "
+                        // Modal Edit (ditaruh di luar <tbody> agar HTML valid)
+                        $modals .= "
                         <div class='modal fade' id='modalEdit{$row['id']}' tabindex='-1' aria-hidden='true'>
                         <div class='modal-dialog modal-lg'>
                             <div class='modal-content'>
@@ -109,7 +110,7 @@
                                     <button type='button' class='btn-close' data-bs-dismiss='modal'></button>
                                 </div>
                                 <div class='modal-body'>
-                                    <?= csrf_field() ?>
+                                    " . csrf_field() . "
                                     <input type='hidden' name='id' value='{$row['id']}'>
 
                                     <div class='row g-3'>
@@ -216,6 +217,9 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Edit per data (dikeluarkan dari <tbody>) -->
+<?= $modals ?>
 
 <!-- Modal Tambah -->
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">

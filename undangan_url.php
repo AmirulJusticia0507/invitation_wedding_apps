@@ -48,25 +48,16 @@
                         <?php
                         $data = $weddingku->query("
                             SELECT uu.*, 
-                                   CONCAT(p.nama_pria, ' & ', p.nama_wanita) AS nama_pengantin
+                                   CONCAT(p.nama_pria, ' & ', p.nama_wanita) AS nama_pengantin,
+                                   t.nama AS nama_tamu
                             FROM undangan_url uu
                             JOIN pengantin p ON uu.pengantin_id = p.id
+                            LEFT JOIN tamu t ON uu.tamu_id = t.id
                             ORDER BY uu.id DESC
                         ");
                         $no = 1;
                         while ($row = $data->fetch_assoc()) {
-                            $tamuQuery = $weddingku->query("
-                                SELECT t.nama
-                                FROM tamu t
-                                JOIN undangan_url uu ON t.id = uu.tamu_id
-                                WHERE uu.id = {$row['id']}
-                            ");
-                            
-                            $tamuList = [];
-                            while ($tamu = $tamuQuery->fetch_assoc()) {
-                                $tamuList[] = $tamu['nama'];
-                            }
-                            $namaTamu = implode(", ", array_map('h', $tamuList));
+                            $namaTamu = !empty($row['nama_tamu']) ? h($row['nama_tamu']) : '<span class="text-slate-500 italic">Tamu tidak ditemukan</span>';
 
                             echo "<tr>
                                 <td class='text-slate-400 text-xs'>" . $no++ . "</td>
@@ -128,8 +119,9 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label text-xs text-slate-300">Pilih Tamu Undangan</label>
+                    <input type="hidden" name="tamu_ids" id="tamu_ids_hidden" required>
                     <div class="input-group">
-                        <textarea name="tamu_ids" id="tamu_ids" class="form-control" placeholder="Klik tombol cari untuk memilih tamu..." rows="2" readonly required></textarea>
+                        <textarea id="tamu_names_display" class="form-control" placeholder="Klik tombol cari untuk memilih tamu..." rows="2" readonly required></textarea>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCariTamu">
                             <i class="fa-solid fa-magnifying-glass"></i> Cari
                         </button>
@@ -363,7 +355,10 @@ $(document).ready(function() {
             selectedNames.push(checkbox.getAttribute('data-nama'));
         });
 
-        document.getElementById('tamu_ids').value = selectedNames.join(', ');
+        const hiddenEl = document.getElementById('tamu_ids_hidden');
+        const displayEl = document.getElementById('tamu_names_display');
+        if (hiddenEl) hiddenEl.value = selectedIds.join(',');
+        if (displayEl) displayEl.value = selectedNames.join(', ');
     });
 });
 </script>

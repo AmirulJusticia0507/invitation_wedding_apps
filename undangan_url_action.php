@@ -4,15 +4,15 @@ include 'koneksi.php';
 
 // Fungsi untuk menghasilkan token undangan unik
 function generateToken($pengantin_id, $tamu_id) {
-    return md5($pengantin_id . '_' . $tamu_id . '_' . uniqid());
+    return md5($pengantin_id . '_' . $tamu_id . '_' . uniqid(mt_rand(), true));
 }
 
 // Tambah data undangan URL baru
 if (isset($_POST['tambah'])) {
     csrf_verify();
-    $pengantin_id = (int) $_POST['pengantin_id'];
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
 
-    // Daftar tamu: dari textarea tamu_ids (koma) atau fallback tamu_id tunggal
+    // Daftar tamu: dari hidden input tamu_ids (koma) atau fallback tamu_id tunggal
     $tamu_ids = [];
     if (!empty($_POST['tamu_ids'])) {
         $tamu_ids = array_filter(array_map('intval', explode(',', $_POST['tamu_ids'])));
@@ -21,90 +21,129 @@ if (isset($_POST['tambah'])) {
     }
 
     if ($pengantin_id <= 0 || empty($tamu_ids)) {
-        header("Location: undangan_url.php");
+        header("Location: undangan_url.php?error=" . urlencode("Silakan pilih pasangan pengantin dan minimal satu tamu undangan."));
         exit;
     }
 
-    $stmt_tamu = $weddingku->prepare("SELECT nama FROM tamu WHERE id = ?");
-    $stmt = $weddingku->prepare("INSERT INTO undangan_url (pengantin_id, tamu_id, encrypted_token, url_undangan) VALUES (?, ?, ?, ?)");
+    try {
+        $stmt_tamu = $weddingku->prepare("SELECT nama FROM tamu WHERE id = ?");
+        $stmt_insert = $weddingku->prepare("INSERT INTO undangan_url (pengantin_id, tamu_id, encrypted_token, url_undangan) VALUES (?, ?, ?, ?)");
 
-    foreach ($tamu_ids as $tamu_id) {
-        $token = generateToken($pengantin_id, $tamu_id);
+        $count = 0;
+        foreach ($tamu_ids as $tamu_id) {
+            if ($tamu_id <= 0) continue;
 
-        $stmt_tamu->bind_param("i", $tamu_id);
-        $stmt_tamu->execute();
-        $tamu = $stmt_tamu->get_result()->fetch_assoc();
-        $nama_tamu = $tamu ? urlencode(str_replace(' ', '-', $tamu['nama'])) : '';
+            $token = generateToken($pengantin_id, $tamu_id);
 
-        $url = "index.php?uid=$token&guest=$nama_tamu";
+            $stmt_tamu->bind_param("i", $tamu_id);
+            $stmt_tamu->execute();
+            $tamu = $stmt_tamu->get_result()->fetch_assoc();
+            $nama_tamu = $tamu ? urlencode(str_replace(' ', '+', $tamu['nama'])) : '';
 
-        $stmt->bind_param("iiss", $pengantin_id, $tamu_id, $token, $url);
-        $stmt->execute();
+            $url = "index.php?uid=$token&guest=$nama_tamu";
+
+            $stmt_insert->bind_param("iiss", $pengantin_id, $tamu_id, $token, $url);
+            $stmt_insert->execute();
+            $count++;
+        }
+
+        header("Location: undangan_url.php?msg=" . urlencode("$count link undangan berhasil dibuat!"));
+        exit;
+    } catch (Throwable $e) {
+        header("Location: undangan_url.php?error=" . urlencode("Gagal membuat link undangan: " . $e->getMessage()));
+        exit;
     }
-
-    header("Location: undangan_url.php");
-    exit;
 }
 
 // Edit data undangan URL
 if (isset($_POST['edit'])) {
     csrf_verify();
-    $id = (int) $_POST['id'];
-    $pengantin_id = (int) $_POST['pengantin_id'];
-    $tamu_id = (int) $_POST['tamu_id'];
+    $id = (int) ($_POST['id'] ?? 0);
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
+    $tamu_id = (int) ($_POST['tamu_id'] ?? 0);
+    $custom_url = trim($_POST['url_undangan'] ?? '');
 
-    // Generate token baru
-    $token = generateToken($pengantin_id, $tamu_id);
+    if ($id <= 0 || $pengantin_id <= 0 || $tamu_id <= 0) {
+        header("Location: undangan_url.php?error=" . urlencode("Data link undangan tidak lengkap."));
+        exit;
+    }
 
-    // Ambil nama tamu
-    $stmt_tamu = $weddingku->prepare("SELECT nama FROM tamu WHERE id = ?");
-    $stmt_tamu->bind_param("i", $tamu_id);
-    $stmt_tamu->execute();
-    $tamu = $stmt_tamu->get_result()->fetch_assoc();
-    $nama_tamu = $tamu ? urlencode(str_replace(' ', '-', $tamu['nama'])) : '';
+    try {
+        // Ambil nama tamu
+        $stmt_tamu = $weddingku->prepare("SELECT nama FROM tamu WHERE id = ?");
+        $stmt_tamu->bind_param("i", $tamu_id);
+        $stmt_tamu->execute();
+        $tamu = $stmt_tamu->get_result()->fetch_assoc();
+        $nama_tamu = $tamu ? urlencode(str_replace(' ', '+', $tamu['nama'])) : '';
 
-    // Buat URL undangan versi clean
-    $url = "index.php?uid=$token&guest=$nama_tamu";
+        // Pertahankan token lama jika ada, atau buat baru jika belum
+        $stmt_check = $weddingku->prepare("SELECT encrypted_token FROM undangan_url WHERE id = ?");
+        $stmt_check->bind_param("i", $id);
+        $stmt_check->execute();
+        $cur = $stmt_check->get_result()->fetch_assoc();
+        $token = !empty($cur['encrypted_token']) ? $cur['encrypted_token'] : generateToken($pengantin_id, $tamu_id);
 
-    // Update database
-    $stmt = $weddingku->prepare("UPDATE undangan_url SET pengantin_id=?, tamu_id=?, encrypted_token=?, url_undangan=? WHERE id = ?");
-    $stmt->bind_param("iissi", $pengantin_id, $tamu_id, $token, $url, $id);
-    $stmt->execute();
+        $url = !empty($custom_url) ? $custom_url : "index.php?uid=$token&guest=$nama_tamu";
 
-    header("Location: undangan_url.php");
-    exit;
+        // Update database
+        $stmt = $weddingku->prepare("UPDATE undangan_url SET pengantin_id=?, tamu_id=?, encrypted_token=?, url_undangan=? WHERE id = ?");
+        $stmt->bind_param("iissi", $pengantin_id, $tamu_id, $token, $url, $id);
+        $stmt->execute();
+
+        header("Location: undangan_url.php?msg=updated");
+        exit;
+    } catch (Throwable $e) {
+        header("Location: undangan_url.php?error=" . urlencode("Gagal memperbarui link undangan: " . $e->getMessage()));
+        exit;
+    }
 }
 
 // Hapus data undangan URL
 if (isset($_GET['hapus'])) {
     csrf_verify();
-    $id = (int) $_GET['hapus'];
+    $id = (int) ($_GET['hapus'] ?? 0);
 
-    $stmt = $weddingku->prepare("DELETE FROM undangan_url WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
+    if ($id <= 0) {
+        header("Location: undangan_url.php?error=" . urlencode("ID undangan tidak valid."));
+        exit;
+    }
 
-    header("Location: undangan_url.php");
-    exit;
+    try {
+        $stmt = $weddingku->prepare("DELETE FROM undangan_url WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        header("Location: undangan_url.php?msg=deleted");
+        exit;
+    } catch (Throwable $e) {
+        header("Location: undangan_url.php?error=" . urlencode("Gagal menghapus link undangan: " . $e->getMessage()));
+        exit;
+    }
 }
 
 // Proses konfirmasi RSVP
 if (isset($_POST['konfirmasi'])) {
     csrf_verify();
-    $id = (int) $_POST['id'];
-    $status = $_POST['status']; // 'hadir' atau 'tidak_hadir'
+    $id = (int) ($_POST['id'] ?? 0);
+    $status = $_POST['status'] ?? ''; // 'hadir' atau 'tidak_hadir'
 
-    // Validasi status
     if ($status !== 'hadir' && $status !== 'tidak_hadir') {
-        die("Status tidak valid!");
+        header("Location: undangan_url.php?error=" . urlencode("Status RSVP tidak valid."));
+        exit;
     }
 
-    // Update status RSVP
-    $stmt = $weddingku->prepare("UPDATE undangan_url SET status_rsvp = ? WHERE id = ?");
-    $stmt->bind_param("si", $status, $id);
-    $stmt->execute();
+    try {
+        $stmt = $weddingku->prepare("UPDATE undangan_url SET status_rsvp = ? WHERE id = ?");
+        $stmt->bind_param("si", $status, $id);
+        $stmt->execute();
 
-    header("Location: undangan_url.php");
-    exit;
+        header("Location: undangan_url.php?msg=" . urlencode("Status RSVP berhasil diperbarui!"));
+        exit;
+    } catch (Throwable $e) {
+        header("Location: undangan_url.php?error=" . urlencode("Gagal memperbarui RSVP: " . $e->getMessage()));
+        exit;
+    }
 }
-?>
+
+header("Location: undangan_url.php");
+exit;

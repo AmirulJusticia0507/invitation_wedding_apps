@@ -32,6 +32,13 @@
         $pengantinId = isset($_GET['pengantin_id']) ? (int) $_GET['pengantin_id'] : '';
         $filterQueryGallery = $pengantinId ? "WHERE pengantin_id = $pengantinId" : '';
         $filterQueryTable = $pengantinId ? "WHERE g.pengantin_id = $pengantinId" : '';
+
+        // Cache list pengantin
+        $allPengantin = [];
+        $pengantinRes = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama FROM pengantin");
+        while ($p = $pengantinRes->fetch_assoc()) {
+            $allPengantin[] = $p;
+        }
         ?>
 
         <!-- Filter Card -->
@@ -41,11 +48,9 @@
                 <select name="pengantin_id" id="pengantin_id" class="form-select text-sm py-1.5" style="width: auto;" onchange="this.form.submit()">
                     <option value="">-- Semua Pasangan Pengantin --</option>
                     <?php
-                    $pengantin = $weddingku->query("SELECT * FROM pengantin");
-                    while ($p = $pengantin->fetch_assoc()) {
-                        $namaLengkap = $p['nama_pria'] . ' & ' . $p['nama_wanita'];
+                    foreach ($allPengantin as $p) {
                         $selected = ($p['id'] == $pengantinId) ? 'selected' : '';
-                        echo "<option value='{$p['id']}' $selected>" . htmlspecialchars($namaLengkap) . "</option>";
+                        echo "<option value='{$p['id']}' $selected>" . htmlspecialchars($p['nama']) . "</option>";
                     }
                     ?>
                 </select>
@@ -98,12 +103,23 @@
                                         <button type='button' class='btn-close' data-bs-dismiss='modal'></button>
                                     </div>
                                     <div class='modal-body'>
-                                        <?= csrf_field() ?>
+                                        " . csrf_field() . "
                                         <input type='hidden' name='id' value='{$row['id']}'>
 
                                         <div class='mb-3'>
                                             <label class='form-label text-xs text-slate-300'>Judul Foto</label>
                                             <input type='text' name='judul' class='form-control' value='" . h($row['judul']) . "' required>
+                                        </div>
+
+                                        <div class='mb-3'>
+                                            <label class='form-label text-xs text-slate-300'>Pasangan Pengantin</label>
+                                            <select name='pengantin_id' class='form-select' required>
+                                                <option value=''>-- Pilih Pengantin --</option>";
+                                                foreach ($allPengantin as $p) {
+                                                    $sel = ($p['id'] == $row['pengantin_id']) ? 'selected' : '';
+                                                    echo "<option value='{$p['id']}' $sel>" . htmlspecialchars($p['nama']) . "</option>";
+                                                }
+                    echo "                  </select>
                                         </div>
 
                                         <div class='mb-3'>

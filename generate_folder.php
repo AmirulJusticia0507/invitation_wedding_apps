@@ -50,7 +50,7 @@
                                         <h5>Edit Folder</h5>
                                     </div>
                                     <div class='modal-body'>
-                                        <?= csrf_field() ?>
+                                        " . csrf_field() . "
                                         <input type='hidden' name='id' value='{$row['id']}'>
                                         <input type='text' name='nama_folder' class='form-control mb-2' value='{$row['nama_folder']}' required>
                                         <textarea name='deskripsi' class='form-control mb-2'>{$row['deskripsi']}</textarea>

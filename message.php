@@ -38,18 +38,27 @@
                 <table class="table table-bordered table-striped table-hover display w-full" id="tabelMessage">
                     <thead>
                         <tr>
+                            <th>Pasangan Pengantin</th>
                             <th>Nama Pengirim</th>
                             <th>Isi Pesan / Ucapan</th>
+                            <th>Waktu</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php
-                    $data = $weddingku->query("SELECT * FROM message ORDER BY id DESC");
+                    $data = $weddingku->query("
+                        SELECT m.*, CONCAT(p.nama_pria, ' & ', p.nama_wanita) AS nama_pengantin 
+                        FROM message m 
+                        LEFT JOIN pengantin p ON m.pengantin_id = p.id 
+                        ORDER BY m.id DESC
+                    ");
                     while ($row = $data->fetch_assoc()) {
                         echo "<tr>
+                            <td class='font-medium text-pink-400 whitespace-nowrap'>" . h($row['nama_pengantin'] ?? '-') . "</td>
                             <td class='font-semibold text-white whitespace-nowrap'>" . h($row['nama']) . "</td>
                             <td class='text-slate-300 leading-relaxed'>" . nl2br(h($row['pesan'])) . "</td>
+                            <td class='text-slate-400 text-xs whitespace-nowrap'>" . h($row['created_at'] ?? '-') . "</td>
                             <td class='whitespace-nowrap'>
                                 <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditPesan{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i>
@@ -73,8 +82,20 @@
                                             <button type='button' class='btn-close' data-bs-dismiss='modal'></button>
                                         </div>
                                         <div class='modal-body'>
-                                            <?= csrf_field() ?>
+                                            " . csrf_field() . "
                                             <input type='hidden' name='id' value='{$row['id']}'>
+
+                                            <div class='mb-3'>
+                                                <label class='form-label text-xs text-slate-300'>Untuk Pasangan Pengantin</label>
+                                                <select name='pengantin_id' class='form-select' required>
+                                                    <option value=''>-- Pilih Pengantin --</option>";
+                                                    $pengantinList->data_seek(0);
+                                                    while ($p = $pengantinList->fetch_assoc()) {
+                                                        $selected = ($p['id'] == $row['pengantin_id']) ? 'selected' : '';
+                                                        echo "<option value='{$p['id']}' $selected>" . h($p['nama_pria']) . " & " . h($p['nama_wanita']) . "</option>";
+                                                    }
+                        echo "                  </select>
+                                            </div>
 
                                             <div class='mb-3'>
                                                 <label class='form-label text-xs text-slate-300'>Nama Pengirim</label>

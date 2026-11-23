@@ -27,6 +27,53 @@ function toggleSidebar() {
         overlay.classList.toggle('hidden');
     }
 }
+
+// Flash notification handler via URL params
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const msg = urlParams.get('msg');
+    const err = urlParams.get('error');
+
+    if (msg) {
+        let title = 'Berhasil!';
+        if (msg === 'saved') title = 'Data berhasil disimpan!';
+        else if (msg === 'updated') title = 'Data berhasil diperbarui!';
+        else if (msg === 'deleted') title = 'Data berhasil dihapus!';
+        else if (msg === 'imported') title = 'Data berhasil diimport!';
+        else title = decodeURIComponent(msg);
+
+        Swal.fire({
+            icon: 'success',
+            title: title,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: '#0f172a',
+            color: '#f8fafc',
+            iconColor: '#10b981'
+        });
+    } else if (err) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Terjadi Kesalahan',
+            text: decodeURIComponent(err),
+            background: '#0f172a',
+            color: '#f8fafc',
+            confirmButtonColor: '#ec4899'
+        });
+    }
+
+    // Clean URL without reloading page
+    if (msg || err) {
+        urlParams.delete('msg');
+        urlParams.delete('error');
+        const newSearch = urlParams.toString();
+        const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+        window.history.replaceState({}, '', newUrl);
+    }
+})();
 </script>
 
 </body>

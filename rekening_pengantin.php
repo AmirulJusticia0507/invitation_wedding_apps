@@ -84,7 +84,7 @@
                                             <button type='button' class='btn-close' data-bs-dismiss='modal'></button>
                                         </div>
                                         <div class='modal-body'>
-                                            <?= csrf_field() ?>
+                                            " . csrf_field() . "
                                             <input type='hidden' name='id' value='{$row['id']}'>
                                             
                                             <div class='mb-3'>

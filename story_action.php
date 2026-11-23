@@ -2,42 +2,84 @@
 include 'auth_check.php';
 include 'koneksi.php';
 
-// Tambah story
+// TAMBAH STORY
 if (isset($_POST['simpan'])) {
     csrf_verify();
-    $bulan = trim($_POST['bulan']);
-    $tahun = (int) $_POST['tahun'];
-    $deskripsi = trim($_POST['deskripsi']);
-    $pengantin_id = (int) $_POST['pengantin_id'];
+    $bulan = trim($_POST['bulan'] ?? '');
+    $tahun = (int) ($_POST['tahun'] ?? 0);
+    $deskripsi = trim($_POST['deskripsi'] ?? '');
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
 
-    $stmt = $weddingku->prepare("INSERT INTO story (bulan, tahun, deskripsi, pengantin_id) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("sisi", $bulan, $tahun, $deskripsi, $pengantin_id);
-    $stmt->execute();
-    header('Location: story.php');
+    if ($bulan === '' || $tahun <= 0 || $pengantin_id <= 0) {
+        header('Location: story.php?error=' . urlencode("Bulan, tahun, dan pasangan pengantin wajib diisi."));
+        exit;
+    }
+
+    try {
+        $stmt = $weddingku->prepare("INSERT INTO story (bulan, tahun, deskripsi, pengantin_id) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("sisi", $bulan, $tahun, $deskripsi, $pengantin_id);
+        $stmt->execute();
+        $stmt->close();
+
+        header('Location: story.php?msg=saved');
+        exit;
+    } catch (Throwable $e) {
+        header('Location: story.php?error=' . urlencode("Gagal menyimpan cerita: " . $e->getMessage()));
+        exit;
+    }
 }
 
-// Update story
+// UPDATE STORY
 if (isset($_POST['update'])) {
     csrf_verify();
-    $id = (int) $_POST['id'];
-    $bulan = trim($_POST['bulan']);
-    $tahun = (int) $_POST['tahun'];
-    $deskripsi = trim($_POST['deskripsi']);
-    $pengantin_id = (int) $_POST['pengantin_id'];
+    $id = (int) ($_POST['id'] ?? 0);
+    $bulan = trim($_POST['bulan'] ?? '');
+    $tahun = (int) ($_POST['tahun'] ?? 0);
+    $deskripsi = trim($_POST['deskripsi'] ?? '');
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
 
-    $stmt = $weddingku->prepare("UPDATE story SET bulan=?, tahun=?, deskripsi=?, pengantin_id=? WHERE id=?");
-    $stmt->bind_param("sisii", $bulan, $tahun, $deskripsi, $pengantin_id, $id);
-    $stmt->execute();
-    header('Location: story.php');
+    if ($id <= 0 || $bulan === '' || $tahun <= 0 || $pengantin_id <= 0) {
+        header('Location: story.php?error=' . urlencode("Data cerita tidak valid atau belum lengkap."));
+        exit;
+    }
+
+    try {
+        $stmt = $weddingku->prepare("UPDATE story SET bulan=?, tahun=?, deskripsi=?, pengantin_id=? WHERE id=?");
+        $stmt->bind_param("sisii", $bulan, $tahun, $deskripsi, $pengantin_id, $id);
+        $stmt->execute();
+        $stmt->close();
+
+        header('Location: story.php?msg=updated');
+        exit;
+    } catch (Throwable $e) {
+        header('Location: story.php?error=' . urlencode("Gagal memperbarui cerita: " . $e->getMessage()));
+        exit;
+    }
 }
 
-// Hapus story
+// HAPUS STORY
 if (isset($_GET['hapus'])) {
     csrf_verify();
-    $id = (int) $_GET['hapus'];
+    $id = (int) ($_GET['hapus'] ?? 0);
 
-    $stmt = $weddingku->prepare("DELETE FROM story WHERE id=?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    header('Location: story.php');
+    if ($id <= 0) {
+        header('Location: story.php?error=' . urlencode("ID cerita tidak valid."));
+        exit;
+    }
+
+    try {
+        $stmt = $weddingku->prepare("DELETE FROM story WHERE id=?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+
+        header('Location: story.php?msg=deleted');
+        exit;
+    } catch (Throwable $e) {
+        header('Location: story.php?error=' . urlencode("Gagal menghapus cerita: " . $e->getMessage()));
+        exit;
+    }
 }
+
+header('Location: story.php');
+exit;
