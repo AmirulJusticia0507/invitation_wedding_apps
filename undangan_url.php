@@ -66,16 +66,16 @@
                             while ($tamu = $tamuQuery->fetch_assoc()) {
                                 $tamuList[] = $tamu['nama'];
                             }
-                            $namaTamu = implode(", ", array_map('htmlspecialchars', $tamuList));
+                            $namaTamu = implode(", ", array_map('h', $tamuList));
 
                             echo "<tr>
                                 <td class='text-slate-400 text-xs'>" . $no++ . "</td>
-                                <td class='font-medium text-pink-400 whitespace-nowrap'>" . htmlspecialchars($row['nama_pengantin']) . "</td>
+                                <td class='font-medium text-pink-400 whitespace-nowrap'>" . h($row['nama_pengantin'] ?? '-') . "</td>
                                 <td class='font-semibold text-white'>" . $namaTamu . "</td>
                                 <td>
                                     <div class='flex items-center gap-2'>
                                         <a href='{$row['url_undangan']}' target='_blank' class='text-xs text-cyan-400 hover:underline max-w-xs truncate inline-block'>
-                                            " . htmlspecialchars($row['url_undangan']) . "
+                                            " . h($row['url_undangan']) . "
                                         </a>
                                         <button onclick=\"navigator.clipboard.writeText('{$row['url_undangan']}'); Swal.fire({toast:true, position:'top-end', icon:'success', title:'Link disalin!', showConfirmButton:false, timer:1500, background:'#0f172a', color:'#fff'});\" 
                                                 class='text-slate-400 hover:text-white text-xs px-2 py-1 rounded bg-slate-800 border border-slate-700'>

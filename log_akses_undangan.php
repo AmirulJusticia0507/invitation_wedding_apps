@@ -48,17 +48,17 @@
                         if ($data) {
                             while ($row = $data->fetch_assoc()) {
                                 echo "<tr>
-                                    <td class='font-semibold text-white whitespace-nowrap'>" . htmlspecialchars($row['nama_tamu']) . "</td>
+                                    <td class='font-semibold text-white whitespace-nowrap'>" . h($row['nama_tamu'] ?? '-') . "</td>
                                     <td>
                                         <a href='{$row['url_undangan']}' target='_blank' class='text-xs text-sky-400 hover:underline max-w-xs truncate inline-block'>
-                                            " . htmlspecialchars($row['url_undangan']) . "
+                                            " . h($row['url_undangan']) . "
                                         </a>
                                     </td>
                                     <td class='whitespace-nowrap text-xs text-slate-300'>
-                                        <i class='fa-regular fa-clock text-slate-500 mr-1'></i> " . htmlspecialchars($row['accessed_at']) . "
+                                        <i class='fa-regular fa-clock text-slate-500 mr-1'></i> " . h($row['accessed_at']) . "
                                     </td>
-                                    <td class='text-xs font-mono text-emerald-400'>" . htmlspecialchars($row['ip_address']) . "</td>
-                                    <td class='text-xs text-slate-400 max-w-sm truncate' title='" . htmlspecialchars($row['user_agent'], ENT_QUOTES) . "'>" . htmlspecialchars($row['user_agent']) . "</td>
+                                    <td class='text-xs font-mono text-emerald-400'>" . h($row['ip_address']) . "</td>
+                                    <td class='text-xs text-slate-400 max-w-sm truncate' title='" . h($row['user_agent']) . "'>" . h($row['user_agent']) . "</td>
                                 </tr>";
                             }
                         }

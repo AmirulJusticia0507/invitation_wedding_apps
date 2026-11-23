@@ -48,8 +48,8 @@
                     $data = $weddingku->query("SELECT * FROM message ORDER BY id DESC");
                     while ($row = $data->fetch_assoc()) {
                         echo "<tr>
-                            <td class='font-semibold text-white whitespace-nowrap'>" . htmlspecialchars($row['nama']) . "</td>
-                            <td class='text-slate-300 leading-relaxed'>" . nl2br(htmlspecialchars($row['pesan'])) . "</td>
+                            <td class='font-semibold text-white whitespace-nowrap'>" . h($row['nama']) . "</td>
+                            <td class='text-slate-300 leading-relaxed'>" . nl2br(h($row['pesan'])) . "</td>
                             <td class='whitespace-nowrap'>
                                 <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditPesan{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i>
@@ -78,12 +78,12 @@
 
                                             <div class='mb-3'>
                                                 <label class='form-label text-xs text-slate-300'>Nama Pengirim</label>
-                                                <input type='text' name='nama_pengirim' class='form-control' value='" . htmlspecialchars($row['nama'], ENT_QUOTES) . "' required>
+                                                <input type='text' name='nama_pengirim' class='form-control' value='" . h($row['nama']) . "' required>
                                             </div>
 
                                             <div class='mb-3'>
                                                 <label class='form-label text-xs text-slate-300'>Isi Pesan</label>
-                                                <textarea name='isi_pesan' class='form-control' rows='4' required>" . htmlspecialchars($row['pesan']) . "</textarea>
+                                                <textarea name='isi_pesan' class='form-control' rows='4' required>" . h($row['pesan']) . "</textarea>
                                             </div>
                                         </div>
                                         <div class='modal-footer'>

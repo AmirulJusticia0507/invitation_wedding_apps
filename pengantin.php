@@ -57,23 +57,23 @@
                         $wanitaImg = !empty($row['foto_wanita']) ? "{$upload_dir}{$row['foto_wanita']}" : "images/istockphoto-487583818-1024x1024.jpg";
                         
                         echo "<tr>
-                            <td class='font-medium text-white'>" . htmlspecialchars($row['nama_pria']) . "</td>
-                            <td>" . htmlspecialchars($row['nama_panggilan_pria']) . "</td>
-                            <td class='font-medium text-white'>" . htmlspecialchars($row['nama_wanita']) . "</td>
-                            <td>" . htmlspecialchars($row['nama_panggilan_wanita']) . "</td>
-                            <td class='text-slate-300'>" . htmlspecialchars($row['alamat_wanita']) . "</td>
-                            <td>" . htmlspecialchars($row['ortu_pria']) . "</td>
-                            <td>" . htmlspecialchars($row['ortu_wanita']) . "</td>
+                            <td class='font-medium text-white'>" . h($row['nama_pria']) . "</td>
+                            <td>" . h($row['nama_panggilan_pria']) . "</td>
+                            <td class='font-medium text-white'>" . h($row['nama_wanita']) . "</td>
+                            <td>" . h($row['nama_panggilan_wanita']) . "</td>
+                            <td class='text-slate-300'>" . h($row['alamat_wanita']) . "</td>
+                            <td>" . h($row['ortu_pria']) . "</td>
+                            <td>" . h($row['ortu_wanita']) . "</td>
                             <td>
                                 <div class='text-xs'>
-                                    <span class='block text-white'>" . htmlspecialchars($row['tanggal_akad']) . "</span>
-                                    <span class='text-slate-400'>" . htmlspecialchars($row['jam_akad']) . "</span>
+                                    <span class='block text-white'>" . h($row['tanggal_akad'] ?? '-') . "</span>
+                                    <span class='text-slate-400'>" . h($row['jam_akad'] ?? '-') . "</span>
                                 </div>
                             </td>
                             <td>
                                 <div class='text-xs'>
-                                    <span class='block text-white'>" . htmlspecialchars($row['tanggal_resepsi']) . "</span>
-                                    <span class='text-slate-400'>" . htmlspecialchars($row['jam_resepsi']) . "</span>
+                                    <span class='block text-white'>" . h($row['tanggal_resepsi'] ?? '-') . "</span>
+                                    <span class='text-slate-400'>" . h($row['jam_resepsi'] ?? '-') . "</span>
                                 </div>
                             </td>
                             <td>
@@ -117,14 +117,14 @@
                                             <label class='form-label text-xs text-slate-300'>Nama Pria</label>
                                             <div class='input-group'>
                                                 <span class='input-group-text'><i class='fa-solid fa-mars'></i></span>
-                                                <input class='form-control' name='nama_pria' value='" . htmlspecialchars($row['nama_pria'], ENT_QUOTES) . "' required>
+                                                <input class='form-control' name='nama_pria' value='" . h($row['nama_pria']) . "' required>
                                             </div>
                                         </div>
                                         <div class='col-md-6'>
                                             <label class='form-label text-xs text-slate-300'>Panggilan Pria</label>
                                             <div class='input-group'>
                                                 <span class='input-group-text'><i class='fa-solid fa-tag'></i></span>
-                                                <input class='form-control' name='nama_panggilan_pria' value='" . htmlspecialchars($row['nama_panggilan_pria'], ENT_QUOTES) . "'>
+                                                <input class='form-control' name='nama_panggilan_pria' value='" . h($row['nama_panggilan_pria']) . "'>
                                             </div>
                                         </div>
 
@@ -132,14 +132,14 @@
                                             <label class='form-label text-xs text-slate-300'>Nama Wanita</label>
                                             <div class='input-group'>
                                                 <span class='input-group-text'><i class='fa-solid fa-venus'></i></span>
-                                                <input class='form-control' name='nama_wanita' value='" . htmlspecialchars($row['nama_wanita'], ENT_QUOTES) . "' required>
+                                                <input class='form-control' name='nama_wanita' value='" . h($row['nama_wanita']) . "' required>
                                             </div>
                                         </div>
                                         <div class='col-md-6'>
                                             <label class='form-label text-xs text-slate-300'>Panggilan Wanita</label>
                                             <div class='input-group'>
                                                 <span class='input-group-text'><i class='fa-solid fa-tag'></i></span>
-                                                <input class='form-control' name='nama_panggilan_wanita' value='" . htmlspecialchars($row['nama_panggilan_wanita'], ENT_QUOTES) . "'>
+                                                <input class='form-control' name='nama_panggilan_wanita' value='" . h($row['nama_panggilan_wanita']) . "'>
                                             </div>
                                         </div>
 
@@ -147,7 +147,7 @@
                                             <label class='form-label text-xs text-slate-300'>Alamat Wanita</label>
                                             <div class='input-group'>
                                                 <span class='input-group-text'><i class='fa-solid fa-location-dot'></i></span>
-                                                <textarea class='form-control' name='alamat_wanita' rows='2'>" . htmlspecialchars($row['alamat_wanita']) . "</textarea>
+                                                <textarea class='form-control' name='alamat_wanita' rows='2'>" . h($row['alamat_wanita']) . "</textarea>
                                             </div>
                                         </div>
 
@@ -155,14 +155,14 @@
                                             <label class='form-label text-xs text-slate-300'>Orang Tua Pria</label>
                                             <div class='input-group'>
                                                 <span class='input-group-text'><i class='fa-solid fa-user-group'></i></span>
-                                                <input class='form-control' name='ortu_pria' value='" . htmlspecialchars($row['ortu_pria'], ENT_QUOTES) . "'>
+                                                <input class='form-control' name='ortu_pria' value='" . h($row['ortu_pria']) . "'>
                                             </div>
                                         </div>
                                         <div class='col-md-6'>
                                             <label class='form-label text-xs text-slate-300'>Orang Tua Wanita</label>
                                             <div class='input-group'>
                                                 <span class='input-group-text'><i class='fa-solid fa-user-group'></i></span>
-                                                <input class='form-control' name='ortu_wanita' value='" . htmlspecialchars($row['ortu_wanita'], ENT_QUOTES) . "'>
+                                                <input class='form-control' name='ortu_wanita' value='" . h($row['ortu_wanita']) . "'>
                                             </div>
                                         </div>
 

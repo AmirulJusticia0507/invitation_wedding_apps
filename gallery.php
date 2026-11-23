@@ -63,17 +63,17 @@
             $data = $weddingku->query("SELECT * FROM gallery $filterQueryGallery ORDER BY tanggal_upload DESC");
             if ($data->num_rows > 0) {
                 while ($row = $data->fetch_assoc()) {
-                    $imgUrl = "assets/gallery/" . htmlspecialchars($row['file']);
+                    $imgUrl = "assets/gallery/" . h($row['file']);
                     echo "
                     <div class='bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg group hover:border-emerald-500/40 transition duration-300'>
                         <div class='relative h-48 overflow-hidden bg-slate-950'>
                             <a href='{$imgUrl}' data-lightbox='grid-galeri'>
-                                <img src='{$imgUrl}' class='w-full h-full object-cover group-hover:scale-105 transition duration-300' alt='" . htmlspecialchars($row['judul']) . "'>
+                                <img src='{$imgUrl}' class='w-full h-full object-cover group-hover:scale-105 transition duration-300' alt='" . h($row['judul']) . "'>
                             </a>
                         </div>
                         <div class='p-4'>
-                            <h5 class='font-semibold text-white text-sm truncate'>" . htmlspecialchars($row['judul']) . "</h5>
-                            <p class='text-xs text-slate-500 mt-1 mb-3'><i class='fa-regular fa-calendar text-[10px] mr-1'></i> " . htmlspecialchars($row['tanggal_upload']) . "</p>
+                            <h5 class='font-semibold text-white text-sm truncate'>" . h($row['judul']) . "</h5>
+                            <p class='text-xs text-slate-500 mt-1 mb-3'><i class='fa-regular fa-calendar text-[10px] mr-1'></i> " . h($row['tanggal_upload']) . "</p>
                             <div class='flex gap-2'>
                                 <button class='flex-1 btn btn-sm btn-outline-warning text-xs' data-bs-toggle='modal' data-bs-target='#modalEditFoto{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i> Edit
@@ -103,7 +103,7 @@
 
                                         <div class='mb-3'>
                                             <label class='form-label text-xs text-slate-300'>Judul Foto</label>
-                                            <input type='text' name='judul' class='form-control' value='" . htmlspecialchars($row['judul'], ENT_QUOTES) . "' required>
+                                            <input type='text' name='judul' class='form-control' value='" . h($row['judul']) . "' required>
                                         </div>
 
                                         <div class='mb-3'>
@@ -153,8 +153,8 @@
                             ORDER BY g.tanggal_upload DESC
                         ");            
                         while ($row = $data->fetch_assoc()) {
-                            $nama_pengantin = htmlspecialchars(($row['nama_pria'] ?? '') . ' & ' . ($row['nama_wanita'] ?? ''));
-                            $imgUrl = "assets/gallery/" . htmlspecialchars($row['file']);
+                            $nama_pengantin = h(($row['nama_pria'] ?? '') . ' & ' . ($row['nama_wanita'] ?? ''));
+                            $imgUrl = "assets/gallery/" . h($row['file']);
                             echo "
                             <tr>
                                 <td>
@@ -162,9 +162,9 @@
                                         <img src='{$imgUrl}' class='w-12 h-12 object-cover rounded-lg border border-slate-700' alt=''>
                                     </a>
                                 </td>
-                                <td class='font-medium text-white'>" . htmlspecialchars($row['judul']) . "</td>
+                                <td class='font-medium text-white'>" . h($row['judul']) . "</td>
                                 <td class='text-pink-400 font-medium'>$nama_pengantin</td>
-                                <td class='text-slate-400 text-xs'>{$row['tanggal_upload']}</td>
+                                <td class='text-slate-400 text-xs'>" . h($row['tanggal_upload']) . "</td>
                                 <td class='whitespace-nowrap'>
                                     <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditFoto{$row['id']}'>
                                         <i class='fa-solid fa-pen-to-square'></i>

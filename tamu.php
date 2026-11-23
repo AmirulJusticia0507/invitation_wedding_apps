@@ -74,9 +74,9 @@
                     
                     while ($row = $data->fetch_assoc()) {
                         echo "<tr>
-                            <td class='font-medium text-pink-400'>" . htmlspecialchars($row['nama_pengantin'] ?? '-') . "</td>
-                            <td class='font-semibold text-white'>" . htmlspecialchars($row['nama']) . "</td>
-                            <td class='text-slate-300'>" . htmlspecialchars($row['alamat'] ?? '-') . "</td>
+                            <td class='font-medium text-pink-400'>" . h($row['nama_pengantin'] ?? '-') . "</td>
+                            <td class='font-semibold text-white'>" . h($row['nama']) . "</td>
+                            <td class='text-slate-300'>" . h($row['alamat'] ?? '-') . "</td>
                             <td class='whitespace-nowrap'>
                                 <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditTamu{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i>
@@ -117,12 +117,12 @@
 
                                             <div class='mb-3'>
                                                 <label class='form-label text-xs text-slate-300'>Nama Tamu</label>
-                                                <input type='text' name='nama' class='form-control' value='" . htmlspecialchars($row['nama'], ENT_QUOTES) . "' required>
+                                                <input type='text' name='nama' class='form-control' value='" . h($row['nama']) . "' required>
                                             </div>
 
                                             <div class='mb-3'>
                                                 <label class='form-label text-xs text-slate-300'>Alamat / Kota</label>
-                                                <textarea name='alamat' class='form-control' rows='3'>" . htmlspecialchars($row['alamat']) . "</textarea>
+                                                <textarea name='alamat' class='form-control' rows='3'>" . h($row['alamat']) . "</textarea>
                                             </div>
                                         </div>
                                         <div class='modal-footer'>

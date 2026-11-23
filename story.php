@@ -51,13 +51,13 @@
                     
                     while ($row = $data->fetch_assoc()) {
                         echo "<tr>
-                            <td class='font-medium text-pink-400 whitespace-nowrap'>" . htmlspecialchars($row['nama_pengantin']) . "</td>
+                            <td class='font-medium text-pink-400 whitespace-nowrap'>" . h($row['nama_pengantin'] ?? '-') . "</td>
                             <td class='whitespace-nowrap'>
                                 <span class='bg-violet-500/10 text-violet-300 border border-violet-500/20 px-2.5 py-1 rounded-full text-xs font-semibold'>
-                                    " . htmlspecialchars($row['bulan']) . " " . htmlspecialchars($row['tahun']) . "
+                                    " . h($row['bulan']) . " " . h($row['tahun']) . "
                                 </span>
                             </td>
-                            <td class='text-slate-300 leading-relaxed'>" . nl2br(htmlspecialchars($row['deskripsi'])) . "</td>
+                            <td class='text-slate-300 leading-relaxed'>" . nl2br(h($row['deskripsi'])) . "</td>
                             <td class='whitespace-nowrap'>
                                 <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditStory{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i>
@@ -91,7 +91,7 @@
                                                     $pengantinList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
                                                     while ($p = $pengantinList->fetch_assoc()) {
                                                         $selected = $p['id'] == $row['pengantin_id'] ? "selected" : "";
-                                                        echo "<option value='{$p['id']}' $selected>" . htmlspecialchars($p['nama_pengantin']) . "</option>";
+                                                        echo "<option value='{$p['id']}' $selected>" . h($p['nama_pengantin']) . "</option>";
                                                     }
                                 echo "          </select>
                                             </div>
@@ -99,17 +99,17 @@
                                             <div class='row g-2 mb-3'>
                                                 <div class='col-7'>
                                                     <label class='form-label text-xs text-slate-300'>Bulan</label>
-                                                    <input type='text' name='bulan' class='form-control' value='" . htmlspecialchars($row['bulan'], ENT_QUOTES) . "' required>
+                                                    <input type='text' name='bulan' class='form-control' value='" . h($row['bulan']) . "' required>
                                                 </div>
                                                 <div class='col-5'>
                                                     <label class='form-label text-xs text-slate-300'>Tahun</label>
-                                                    <input type='number' name='tahun' class='form-control' value='" . htmlspecialchars($row['tahun'], ENT_QUOTES) . "' required>
+                                                    <input type='number' name='tahun' class='form-control' value='" . h($row['tahun']) . "' required>
                                                 </div>
                                             </div>
 
                                             <div class='mb-3'>
                                                 <label class='form-label text-xs text-slate-300'>Deskripsi Cerita</label>
-                                                <textarea name='deskripsi' class='form-control' rows='4'>" . htmlspecialchars($row['deskripsi']) . "</textarea>
+                                                <textarea name='deskripsi' class='form-control' rows='4'>" . h($row['deskripsi']) . "</textarea>
                                             </div>
                                         </div>
                                         <div class='modal-footer'>

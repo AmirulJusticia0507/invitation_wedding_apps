@@ -1,4 +1,11 @@
 <!-- header.php -->
+<?php
+if (!function_exists('h')) {
+    function h($str, $flags = ENT_QUOTES) {
+        return htmlspecialchars((string)($str ?? ''), $flags, 'UTF-8');
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>

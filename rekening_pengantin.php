@@ -55,12 +55,12 @@
 
                     while ($row = $data->fetch_assoc()) {
                         echo "<tr>
-                            <td class='font-medium text-pink-400 whitespace-nowrap'>" . htmlspecialchars($row['nama_pengantin']) . "</td>
+                            <td class='font-medium text-pink-400 whitespace-nowrap'>" . h($row['nama_pengantin'] ?? '-') . "</td>
                             <td>
-                                <code class='text-emerald-400 bg-slate-950 px-2 py-1 rounded text-xs font-mono font-bold'>" . htmlspecialchars($row['nomor_rekening']) . "</code>
+                                <code class='text-emerald-400 bg-slate-950 px-2 py-1 rounded text-xs font-mono font-bold'>" . h($row['nomor_rekening']) . "</code>
                             </td>
-                            <td class='font-semibold text-white'>" . htmlspecialchars($row['bank'] ?? '—') . "</td>
-                            <td class='text-slate-300'>" . htmlspecialchars($row['catatan']) . "</td>
+                            <td class='font-semibold text-white'>" . h($row['bank'] ?? '—') . "</td>
+                            <td class='text-slate-300'>" . h($row['catatan']) . "</td>
                             <td class='whitespace-nowrap'>
                                 <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditRekening{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i>
@@ -94,14 +94,14 @@
                                                     $pengantinList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
                                                     while ($p = $pengantinList->fetch_assoc()) {
                                                         $selected = $p['id'] == $row['pengantin_id'] ? "selected" : "";
-                                                        echo "<option value='{$p['id']}' $selected>" . htmlspecialchars($p['nama_pengantin']) . "</option>";
+                                                        echo "<option value='{$p['id']}' $selected>" . h($p['nama_pengantin']) . "</option>";
                                                     }
                                 echo "          </select>
                                             </div>
 
                                             <div class='mb-3'>
                                                 <label class='form-label text-xs text-slate-300'>Nomor Rekening</label>
-                                                <input type='text' name='nomor_rekening' class='form-control' value='" . htmlspecialchars($row['nomor_rekening'], ENT_QUOTES) . "' required>
+                                                <input type='text' name='nomor_rekening' class='form-control' value='" . h($row['nomor_rekening']) . "' required>
                                             </div>
 
                                             <div class='mb-3'>
@@ -111,14 +111,14 @@
                                                     $bankList = $weddingku->query("SELECT id, nama_bank FROM bank_list ORDER BY nama_bank");
                                                     while ($b = $bankList->fetch_assoc()) {
                                                         $selectedBank = $b['id'] == $row['bank_id'] ? "selected" : "";
-                                                        echo "<option value='{$b['id']}' $selectedBank>" . htmlspecialchars($b['nama_bank']) . "</option>";
+                                                        echo "<option value='{$b['id']}' $selectedBank>" . h($b['nama_bank']) . "</option>";
                                                     }
                                 echo "          </select>
                                             </div>
 
                                             <div class='mb-3'>
                                                 <label class='form-label text-xs text-slate-300'>Atas Nama Rekening</label>
-                                                <input type='text' name='catatan' class='form-control' value='" . htmlspecialchars($row['catatan'], ENT_QUOTES) . "' placeholder='Contoh: Amirul Putra' required>
+                                                <input type='text' name='catatan' class='form-control' value='" . h($row['catatan']) . "' placeholder='Contoh: Amirul Putra' required>
                                             </div>
                                         </div>
                                         <div class='modal-footer'>
