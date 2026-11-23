@@ -4,143 +4,183 @@
 <?php include 'sidebar.php'; ?>
 
 <div class="content-wrapper">
-    <!-- Breadcrumb -->
-    <div class="breadcrumb-section">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb float-right">
-                <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Data Tamu Undangan</li>
-            </ol>
-        </nav>
-    </div>
-    <section class="content p-3">
-        </br></br>
-        <h4>Data Tamu Undangan</h4>
-        <button class="btn btn-outline-primary mb-3 d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalTambahTamu">
-            <i class="fas fa-user-plus"></i> Tambah Tamu
-        </button>
+    <div class="p-6 max-w-7xl w-full mx-auto">
+        <!-- Breadcrumb & Title -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+                <nav class="flex text-xs text-slate-400 gap-2 mb-1">
+                    <a href="dashboard.php" class="hover:text-blue-400 transition">Home</a>
+                    <span>/</span>
+                    <span class="text-blue-400 font-medium">Data Tamu Undangan</span>
+                </nav>
+                <h1 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-users"></i>
+                    </span>
+                    Data Tamu Undangan
+                </h1>
+            </div>
+            <div>
+                <button class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white font-medium px-4 py-2.5 rounded-xl text-sm shadow-lg shadow-blue-500/20 transition flex items-center gap-2"
+                        data-bs-toggle="modal" data-bs-target="#modalTambahTamu">
+                    <i class="fa-solid fa-user-plus"></i> Tambah Tamu
+                </button>
+            </div>
+        </div>
 
-        </br></br>
-        <form action="import_tamu.php" method="POST" enctype="multipart/form-data" class="mb-3">
-            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-            <div class="input-group" style="max-width: 600px;">
+        <!-- Import Section Card -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-6 shadow-xl">
+            <h2 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-file-excel text-emerald-400"></i> Import Data Tamu dari Excel
+            </h2>
+            <form action="import_tamu.php" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3">
+                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                 <?php
                 $pengantinImportList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
                 ?>
-                <select name="pengantin_id" class="form-select" style="max-width: 250px;" required>
+                <select name="pengantin_id" class="form-select flex-1 sm:max-w-xs" required>
                     <option value="">-- Pilih Pengantin --</option>
                     <?php while ($p = $pengantinImportList->fetch_assoc()) {
-                        echo "<option value='{$p['id']}'>{$p['nama_pengantin']}</option>";
+                        echo "<option value='{$p['id']}'>" . htmlspecialchars($p['nama_pengantin']) . "</option>";
                     } ?>
                 </select>
-                <input type="file" name="file_excel" class="form-control" accept=".xls,.xlsx" required>
-                <button type="submit" name="import" class="btn btn-success">
-                    <i class="fa fa-upload"></i> Import Excel
-                </button>
-            </div>
-        </form>
+                <input type="file" name="file_excel" class="form-control flex-1" accept=".xls,.xlsx" required>
+                <button type="submit" name="import" class="btn btn-success d-inline-flex align-items-center gap-2 px-4">
+                    <i class="fa-solid fa-file-import"></i> Import
+                </button>
+            </form>
+        </div>
 
-        <table class="table table-bordered table-striped table-hover display" style="width:100%" nowrap id="tabelTamu">
-            <thead>
-                <tr>
-                    <th>Pengantin</th>
-                    <th>Nama Tamu</th>
-                    <th>Alamat</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php
-            $data = $weddingku->query("
-            SELECT tamu.*, 
-                   CONCAT(pengantin.nama_pria, ' & ', pengantin.nama_wanita) AS nama_pengantin
-            FROM tamu
-            LEFT JOIN pengantin ON tamu.pengantin_id = pengantin.id
-        ");
-        
-while ($row = $data->fetch_assoc()) {
-                echo "<tr>
-                    <td>" . htmlspecialchars($row['nama_pengantin']) . "</td>
-                    <td>" . htmlspecialchars($row['nama']) . "</td>
-                    <td>" . htmlspecialchars($row['alamat']) . "</td>
-                    <td>
-                         <button class='btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1' data-bs-toggle='modal' data-bs-target='#modalEditTamu{$row['id']}'>
-                             <i class='fas fa-edit'></i> Edit
-                         </button>
-                         <a href='" . csrf_url("tamu_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1' onclick=\"return confirm('Yakin hapus data tamu?')\">
-                             <i class='fas fa-trash-alt'></i> Hapus
-                         </a>
-                    </td>
-                </tr>";
+        <!-- Table Card -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <div class="overflow-x-auto">
+                <table class="table table-bordered table-striped table-hover display w-full" id="tabelTamu">
+                    <thead>
+                        <tr>
+                            <th>Pasangan Pengantin</th>
+                            <th>Nama Tamu</th>
+                            <th>Alamat</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $data = $weddingku->query("
+                        SELECT tamu.*, 
+                               CONCAT(pengantin.nama_pria, ' & ', pengantin.nama_wanita) AS nama_pengantin
+                        FROM tamu
+                        LEFT JOIN pengantin ON tamu.pengantin_id = pengantin.id
+                    ");
+                    
+                    while ($row = $data->fetch_assoc()) {
+                        echo "<tr>
+                            <td class='font-medium text-pink-400'>" . htmlspecialchars($row['nama_pengantin'] ?? '-') . "</td>
+                            <td class='font-semibold text-white'>" . htmlspecialchars($row['nama']) . "</td>
+                            <td class='text-slate-300'>" . htmlspecialchars($row['alamat'] ?? '-') . "</td>
+                            <td class='whitespace-nowrap'>
+                                <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditTamu{$row['id']}'>
+                                    <i class='fa-solid fa-pen-to-square'></i>
+                                </button>
+                                <a href='" . csrf_url("tamu_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger' onclick=\"return confirm('Yakin hapus data tamu ini?')\">
+                                    <i class='fa-solid fa-trash-can'></i>
+                                </a>
+                            </td>
+                        </tr>";
 
-                // Modal Edit
-                echo "
-                <div class='modal fade' id='modalEditTamu{$row['id']}'>
-                    <div class='modal-dialog'>
-                        <div class='modal-content'>
-                            <form method='POST' action='tamu_action.php'>
-                                <div class='modal-header'>
-                                    <h5>Edit Tamu</h5>
-                                </div>
-                                <div class='modal-body'>
-                                    <?= csrf_field() ?>
-                                    <input type='hidden' name='id' value='{$row['id']}'>
-                                    <input type='text' name='nama' class='form-control mb-2' value='{$row['nama']}' required>
-                                    <textarea name='alamat' class='form-control mb-2'>{$row['alamat']}</textarea>
+                        // Modal Edit Tamu
+                        echo "
+                        <div class='modal fade' id='modalEditTamu{$row['id']}' tabindex='-1' aria-hidden='true'>
+                            <div class='modal-dialog'>
+                                <div class='modal-content'>
+                                    <form method='POST' action='tamu_action.php'>
+                                        <div class='modal-header'>
+                                            <h5 class='modal-title font-bold text-white flex items-center gap-2'>
+                                                <i class='fa-solid fa-pen-to-square text-amber-400'></i> Edit Data Tamu
+                                            </h5>
+                                            <button type='button' class='btn-close' data-bs-dismiss='modal'></button>
+                                        </div>
+                                        <div class='modal-body'>
+                                            <?= csrf_field() ?>
+                                            <input type='hidden' name='id' value='{$row['id']}'>
+                                            
+                                            <div class='mb-3'>
+                                                <label class='form-label text-xs text-slate-300'>Pasangan Pengantin</label>
+                                                <select name='pengantin_id' class='form-select' required>
+                                                    <option value=''>-- Pilih Pengantin --</option>";
+                                                    $pengantinList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
+                                                    while ($p = $pengantinList->fetch_assoc()) {
+                                                        $selected = $p['id'] == $row['pengantin_id'] ? "selected" : "";
+                                                        echo "<option value='{$p['id']}' $selected>" . htmlspecialchars($p['nama_pengantin']) . "</option>";
+                                                    }
+                        echo "                  </select>
+                                            </div>
 
-                                    <select name='pengantin_id' class='form-control mb-2' required>
-                                        <option value=''>-- Pilih Pengantin --</option>";
-                                        $pengantinList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
-                                        while ($p = $pengantinList->fetch_assoc()) {
-                                            $selected = $p['id'] == $row['pengantin_id'] ? "selected" : "";
-                                            echo "<option value='{$p['id']}' $selected>{$p['nama_pengantin']}</option>";
-                                        }
-                echo "              </select>
+                                            <div class='mb-3'>
+                                                <label class='form-label text-xs text-slate-300'>Nama Tamu</label>
+                                                <input type='text' name='nama' class='form-control' value='" . htmlspecialchars($row['nama'], ENT_QUOTES) . "' required>
+                                            </div>
+
+                                            <div class='mb-3'>
+                                                <label class='form-label text-xs text-slate-300'>Alamat / Kota</label>
+                                                <textarea name='alamat' class='form-control' rows='3'>" . htmlspecialchars($row['alamat']) . "</textarea>
+                                            </div>
+                                        </div>
+                                        <div class='modal-footer'>
+                                            <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Batal</button>
+                                            <button type='submit' name='update' class='btn btn-primary'>Update Tamu</button>
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class='modal-footer'>
-                                    <button type='submit' name='update' class='btn btn-success'>Update</button>
-                                    <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Batal</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>";
-            }
-            ?>
-            </tbody>
-        </table>
-    </section>
+                            </div>
+                        </div>";
+                    }
+                    ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Modal Tambah -->
-<div class="modal fade" id="modalTambahTamu">
+<!-- Modal Tambah Tamu -->
+<div class="modal fade" id="modalTambahTamu" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="POST" action="tamu_action.php">
-                <div class="modal-header"><h5>Tambah Tamu</h5></div>
+                <div class="modal-header">
+                    <h5 class="modal-title font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-blue-400"></i> Tambah Tamu Undangan
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
-                <?= csrf_field() ?>
-                <?php
-                $pengantinList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
-                ?>
+                    <?= csrf_field() ?>
+                    <?php
+                    $pengantinList = $weddingku->query("SELECT id, CONCAT(nama_pria, ' & ', nama_wanita) as nama_pengantin FROM pengantin");
+                    ?>
+                    <div class="mb-3">
+                        <label class="form-label text-xs text-slate-300">Pasangan Pengantin</label>
+                        <select name="pengantin_id" class="form-select" required>
+                            <option value="">-- Pilih Pengantin --</option>
+                            <?php while ($p = $pengantinList->fetch_assoc()) {
+                                echo "<option value='{$p['id']}'>" . htmlspecialchars($p['nama_pengantin']) . "</option>";
+                            } ?>
+                        </select>
+                    </div>
 
-                <select name="pengantin_id" class="form-control mb-2" required>
-                    <option value="">-- Pilih Pengantin --</option>
-                    <?php while ($p = $pengantinList->fetch_assoc()) {
-                        echo "<option value='{$p['id']}'>{$p['nama_pengantin']}</option>";
-                    } ?>
-                </select>
+                    <div class="mb-3">
+                        <label class="form-label text-xs text-slate-300">Nama Tamu</label>
+                        <input type="text" name="nama" class="form-control" placeholder="Contoh: Bpk. Bambang & Keluarga" required>
+                    </div>
 
-                    <input type="text" name="nama" class="form-control mb-2" placeholder="Nama Tamu" required>
-                    <textarea name="alamat" class="form-control mb-2" placeholder="Alamat"></textarea>
+                    <div class="mb-3">
+                        <label class="form-label text-xs text-slate-300">Alamat / Kota</label>
+                        <textarea name="alamat" class="form-control" rows="3" placeholder="Contoh: Jakarta Selatan"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" name="simpan" class="btn btn-outline-primary d-inline-flex align-items-center gap-2">
-                        <i class="fas fa-save"></i> Simpan
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2" data-bs-dismiss="modal">
-                        <i class="fas fa-times-circle"></i> Batal
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" name="simpan" class="btn btn-primary">Simpan Tamu</button>
                 </div>
             </form>
         </div>
@@ -150,24 +190,24 @@ while ($row = $data->fetch_assoc()) {
 <?php include 'footer.php'; ?>
 
 <script>
-    $(document).ready(function() {
-        $('#tabelTamu').DataTable({
-            responsive: true,
-            scrollX: true,
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data per halaman",
-                zeroRecords: "Data tidak ditemukan",
-                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                infoEmpty: "Tidak ada data tersedia",
-                infoFiltered: "(difilter dari _MAX_ total data)",
-                paginate: {
-                    first: "Awal",
-                    last: "Akhir",
-                    next: "Berikutnya",
-                    previous: "Sebelumnya"
-                },
-            }
-        });
-    });
+$(document).ready(function() {
+    $('#tabelTamu').DataTable({
+        responsive: true,
+        scrollX: true,
+        language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ data per halaman",
+            zeroRecords: "Data tidak ditemukan",
+            info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+            infoEmpty: "Tidak ada data tersedia",
+            infoFiltered: "(difilter dari _MAX_ total data)",
+            paginate: {
+                first: "Awal",
+                last: "Akhir",
+                next: "Berikutnya",
+                previous: "Sebelumnya"
+            },
+        }
+    });
+});
 </script>
