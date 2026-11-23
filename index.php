@@ -184,6 +184,7 @@ function toggleDarkMode() {
 
 <!-- Slide 1 -->
 <section class="slide slide-1" id="slide-1">
+  <span>THE WEDDING OF</span>
   <h1><?= htmlspecialchars($data['nama_panggilan_pria']) ?> & <?= htmlspecialchars($data['nama_panggilan_wanita']) ?></h1>
   <p>Kepada Bapak/Ibu/Saudara/i</p>
   <h3 class="tamu-nama"><?= htmlspecialchars($data['nama_tamu']) ?></h3>
@@ -220,13 +221,12 @@ function toggleDarkMode() {
         <p>Detik</p>
       </div>
     </div>
-
-    <!-- <div class="btn-group mt-5">
+  </div>
+</div>
+  <!-- <div class="btn-group mt-5">
       <a onclick="prevSlide()" class="btn btn-light">⬅️ Kembali</a> &emsp;
       <button onclick="nextSlide()" class="btn btn-primary">Lanjut ➡️</button>
     </div> -->
-  </div>
-</div>
 
 <!-- Slide 3: Akad & Resepsi -->
 <div class="slide" id="slide-3" style="background-image: url('images/bg-miror.jpg'); display: none;">
@@ -235,16 +235,22 @@ function toggleDarkMode() {
     <!-- Foto Pengantin dan Informasi -->
     <div class="d-flex flex-column justify-content-center align-items-center gap-4 mb-4">
         <!-- Foto Pengantin Pria dan Wanita -->
-    <?php $foto_pria = !empty($data['foto_pria']) ? htmlspecialchars($data['foto_pria']) : ''; ?>
-    <?php $foto_wanita = !empty($data['foto_wanita']) ? htmlspecialchars($data['foto_wanita']) : ''; ?>
-    <div class="d-flex justify-content-center gap-5 flex-wrap">
-        <div class="text-center">
-            <div class="photo-frame">
-                <?php if ($foto_pria): ?>
-                    <img src="uploads/<?= $foto_pria ?>" alt="Pengantin Pria" class="rounded-circle" width="150" height="150">
-                <?php else: ?>
-                    <img src="images/istockphoto-487583818-1024x1024.jpg" alt="Pengantin Pria" class="rounded-circle" width="150" height="150" style="background:#eee;">
-                <?php endif; ?>
+
+        <div class="d-flex justify-content-center gap-5 flex-wrap">
+            <div class="text-center">
+                <div class="photo-frame">
+                    <img src="uploads/<?= htmlspecialchars($data['foto_pria']) ?>" alt="Pengantin Pria" class="rounded-circle" width="150" height="150">
+                </div>
+                <p class="mt-2 text-white"><?= htmlspecialchars($data['nama_panggilan_pria']) ?></p>
+                <p class="text-white">Orang Tua: <br><?= htmlspecialchars($data['ortu_pria']) ?></p>
+            </div>
+            <div class="text-center">
+                <div class="photo-frame">
+                    <img src="uploads/<?= htmlspecialchars($data['foto_wanita']) ?>" alt="Pengantin Wanita" class="rounded-circle" width="150" height="150" style="transform: scaleX(-1);">
+                </div>
+                <p class="mt-2 text-white"><?= htmlspecialchars($data['nama_panggilan_wanita']) ?></p>
+                <p class="text-white">Orang Tua: <br><?= htmlspecialchars($data['ortu_wanita']) ?></p>
+
             </div>
             <p class="mt-2 text-white"><?= htmlspecialchars($data['nama_panggilan_pria']) ?></p>
             <p class="text-white">Orang Tua: <br><?= htmlspecialchars($data['ortu_pria']) ?></p>
@@ -298,7 +304,7 @@ function toggleDarkMode() {
             </div>
         </div>
         <!-- <a href="rsvp_handler.php?uid=<?= $token ?>" onclick="return confirm('Yakin tidak bisa hadir? 😢')" class="btn btn-danger mt-4">Saya Tidak Bisa Hadir</a> -->
-        <a href="#" id="rsvpLink" class="btn btn-danger mt-4">Saya Tidak Bisa Hadir</a>
+        <a href="#" id="rsvpLink" class="btn btn-danger mt-4"><i class="fas fa-times-circle"></i> Saya Tidak Bisa Hadir</a>
     </div>
 </div>
 

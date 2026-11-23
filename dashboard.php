@@ -54,12 +54,38 @@ $total_tamu = $weddingku->query("SELECT COUNT(*) as total FROM tamu")->fetch_ass
         .breadcrumb-section {
             margin-top: 10px;
         }
+        /* Sidebar collapsed */
+        #sidebar.collapsed {
+            width: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: absolute;
+            z-index: 999;
+        }
+
+        /* Saat sidebar disembunyikan, konten melebar */
+        #contentWrapper.expanded {
+            margin-left: 0 !important;
+            transition: all 0.3s ease;
+        }
+
+        /* Default untuk contentWrapper saat sidebar tampil */
+        #contentWrapper {
+            margin-left: 250px; /* Sesuaikan dengan lebar sidebar default */
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
     <?php include 'sidebar.php'; ?>
-    <div class="content-wrapper">
+    <!-- Tombol Toggle Sidebar -->
+    <div class="p-2">
+        <button class="btn btn-primary" id="toggleSidebarBtn">
+           <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    <div class="content-wrapper" id="contentWrapper">
         <!-- Breadcrumb -->
         <div class="breadcrumb-section">
             <nav aria-label="breadcrumb">
@@ -405,6 +431,14 @@ function showUcapan(pengantin_id) {
             console.error('Error fetching ucapan data:', error);
         });
 }
+
+document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
+  const sidebar = document.getElementById('sidebar');
+  const content = document.getElementById('contentWrapper');
+
+  sidebar.classList.toggle('collapsed');
+  content.classList.toggle('expanded');
+});
 </script>
 
 

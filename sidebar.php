@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-dark-primary elevation-4" id="sidebar">
     <a href="dashboard.php" class="brand-link">
         <span class="brand-text font-weight-light">Wedding Dashboard</span>
     </a>
