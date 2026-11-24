@@ -51,6 +51,15 @@ $pengantinList = $weddingku->query("SELECT nama_pria, nama_wanita FROM pengantin
         }
     </script>
     <style>
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        @media (max-width: 1023px) {
+            #sidebar { transform: translateX(-100%); }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+        }
+        body.sidebar-collapsed #sidebar { transform: translateX(-100%); }
+        @media (min-width: 1024px) {
+            body.sidebar-collapsed #mainContent { margin-left: 0 !important; }
+        }
         .stat-card { animation: fadeInUp 0.5s ease forwards; opacity: 0; }
         .stat-card:nth-child(1) { animation-delay: 0.1s; }
         .stat-card:nth-child(2) { animation-delay: 0.2s; }
@@ -75,8 +84,8 @@ $pengantinList = $weddingku->query("SELECT nama_pria, nama_wanita FROM pengantin
 
     <!-- Topbar -->
     <header class="sticky top-0 z-20 bg-slate-900/80 backdrop-blur border-b border-slate-800 px-6 py-4 flex items-center gap-4">
-        <button onclick="toggleSidebar()"
-                class="lg:hidden w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition">
+        <button onclick="toggleSidebar()" aria-label="Sembunyikan atau tampilkan sidebar" aria-controls="sidebar" aria-expanded="true"
+                class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition">
             <i class="fa-solid fa-bars text-slate-300 text-sm"></i>
         </button>
         <div>
@@ -425,15 +434,6 @@ function esc(str) {
 }
 
 // --- Sidebar toggle ---
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    sidebar.classList.toggle('-translate-x-full');
-    overlay.classList.toggle('hidden');
-}
-// Desktop: sidebar always visible
-document.getElementById('sidebar').classList.add('lg:translate-x-0');
-
 // --- Detail panel toggle ---
 function toggleDetail(id) {
     const el = document.getElementById(id);

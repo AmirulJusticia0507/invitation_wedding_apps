@@ -20,12 +20,20 @@
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
-    if (sidebar) {
-        sidebar.classList.toggle('-translate-x-full');
+    const isMobile = window.matchMedia('(max-width: 1023px)').matches;
+    if (isMobile) {
+        document.body.classList.toggle('sidebar-open');
+    } else {
+        document.body.classList.toggle('sidebar-collapsed');
+        document.body.classList.remove('sidebar-open');
     }
+    const isOpen = isMobile ? document.body.classList.contains('sidebar-open') : !document.body.classList.contains('sidebar-collapsed');
     if (overlay) {
-        overlay.classList.toggle('hidden');
+        overlay.classList.toggle('hidden', !isMobile || !isOpen);
     }
+    document.querySelectorAll('[aria-controls="sidebar"]').forEach(button => {
+        button.setAttribute('aria-expanded', String(isOpen));
+    });
 }
 
 // Flash notification handler via URL params

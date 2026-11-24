@@ -53,9 +53,19 @@ if (!function_exists('h')) {
             transition: all 0.3s ease;
             background-color: #020617;
         }
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        @media (max-width: 1023px) {
+            #sidebar { transform: translateX(-100%); }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+        }
+        body.sidebar-collapsed #sidebar { transform: translateX(-100%); }
         @media (min-width: 1024px) {
             .content-wrapper {
                 margin-left: 16rem !important; /* 64 = 256px = 16rem */
+            }
+            body.sidebar-collapsed .content-wrapper,
+            body.sidebar-collapsed #mainContent {
+                margin-left: 0 !important;
             }
         }
 
@@ -188,9 +198,9 @@ if (!function_exists('h')) {
 <body class="bg-slate-950 text-slate-100 min-h-screen">
 
 <!-- Topbar for Mobile Sidebar Toggle & Page Info -->
-<div class="lg:hidden sticky top-0 z-30 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+<div class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-        <button onclick="toggleSidebar()" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300">
+        <button onclick="toggleSidebar()" aria-label="Sembunyikan atau tampilkan sidebar" aria-controls="sidebar" aria-expanded="true" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300">
             <i class="fa-solid fa-bars text-sm"></i>
         </button>
         <span class="font-bold text-white text-sm">Wedding Admin</span>
