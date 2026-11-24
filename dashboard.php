@@ -428,6 +428,28 @@ $pengantinList = $weddingku->query("SELECT nama_pria, nama_wanita FROM pengantin
 </div>
 
 <script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const isMobile = window.matchMedia('(max-width: 1023px)').matches;
+
+    if (isMobile) {
+        document.body.classList.toggle('sidebar-open');
+    } else {
+        document.body.classList.toggle('sidebar-collapsed');
+        document.body.classList.remove('sidebar-open');
+    }
+
+    const isOpen = isMobile
+        ? document.body.classList.contains('sidebar-open')
+        : !document.body.classList.contains('sidebar-collapsed');
+
+    if (overlay) overlay.classList.toggle('hidden', !isMobile || !isOpen);
+    document.querySelectorAll('[aria-controls="sidebar"]').forEach(button => {
+        button.setAttribute('aria-expanded', String(isOpen));
+    });
+}
+
 // --- Helpers ---
 function esc(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
