@@ -1,4 +1,10 @@
 <?php
+// File ini adalah endpoint POST, bukan halaman yang dibuka langsung.
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: login.php');
+    exit;
+}
+
 include 'koneksi.php';
 session_start([
     'cookie_httponly' => true,
