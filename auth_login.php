@@ -16,12 +16,7 @@ $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $password = isset($_POST['password']) ? $_POST['password'] : '';
 
 if ($email === '' || $password === '') {
-    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-    echo "<script>
-        Swal.fire('Error', 'Email dan password wajib diisi!', 'error').then(() => {
-            window.history.back();
-        });
-    </script>";
+    header('Location: login.php?error=' . urlencode('Email dan password wajib diisi.'));
     exit;
 }
 
@@ -37,21 +32,12 @@ if ($result->num_rows > 0) {
         $_SESSION['user_id'] = $user['id'];
         header("Location: dashboard.php");
         exit;
-    }
-     else {
-        echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-        echo "<script>
-            Swal.fire('Error', 'Email atau password salah!', 'error').then(() => {
-                window.history.back();
-            });
-        </script>";
+    } else {
+        header('Location: login.php?error=' . urlencode('Email atau password salah.'));
+        exit;
     }
 } else {
-    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-    echo "<script>
-        Swal.fire('Error', 'Email atau password salah!', 'error').then(() => {
-            window.history.back();
-        });
-    </script>";
+    header('Location: login.php?error=' . urlencode('Email atau password salah.'));
+    exit;
 }
 ?>
