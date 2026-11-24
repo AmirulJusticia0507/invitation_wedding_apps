@@ -1,9 +1,14 @@
 <?php
-$server = "localhost";
-$username = "root";
-$password = "";
+$server = getenv('WEDDING_DB_HOST') ?: '127.0.0.1';
+$username = getenv('WEDDING_DB_USER') ?: 'root';
+$password = getenv('WEDDING_DB_PASSWORD');
+if ($password === false) {
+    $password = 'mysql';
+}
+$database = getenv('WEDDING_DB_NAME') ?: 'weddingku_db';
 
 // Koneksi tanpa database terlebih dahulu
+mysqli_report(MYSQLI_REPORT_OFF);
 $conn = new mysqli($server, $username, $password);
 
 if ($conn->connect_error) {
@@ -11,11 +16,11 @@ if ($conn->connect_error) {
 }
 
 // Buat database weddingku_db jika belum ada
-$conn->query("CREATE DATABASE IF NOT EXISTS `weddingku_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci");
-$conn->select_db("weddingku_db");
+$conn->query("CREATE DATABASE IF NOT EXISTS `{$database}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci");
+$conn->select_db($database);
 
-// Cek apakah tabel users sudah ada
-$tabelCheck = $conn->query("SHOW TABLES LIKE 'users'");
+// Cek apakah schema utama sudah ada sebelum mengimpor dump awal.
+$tabelCheck = $conn->query("SHOW TABLES LIKE 'pengantin'");
 if ($tabelCheck->num_rows == 0) {
     $sqlFile = __DIR__ . '/sql/weddingku_db.sql';
     if (file_exists($sqlFile)) {
@@ -29,10 +34,6 @@ if ($tabelCheck->num_rows == 0) {
         }
     }
 }
-
-// Set password default admin menjadi 'admin123'
-$newHash = password_hash('admin123', PASSWORD_BCRYPT);
-$conn->query("UPDATE `users` SET `password` = '$newHash' WHERE `email` = 'admin@gmail.com'");
 
 // Pastikan tabel password_resets ada
 $conn->query("CREATE TABLE IF NOT EXISTS `password_resets` (

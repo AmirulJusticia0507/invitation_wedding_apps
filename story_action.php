@@ -4,6 +4,7 @@ include 'koneksi.php';
 
 // TAMBAH STORY
 if (isset($_POST['simpan'])) {
+    csrf_require_post();
     csrf_verify();
     $bulan = trim($_POST['bulan'] ?? '');
     $tahun = (int) ($_POST['tahun'] ?? 0);
@@ -31,6 +32,7 @@ if (isset($_POST['simpan'])) {
 
 // UPDATE STORY
 if (isset($_POST['update'])) {
+    csrf_require_post();
     csrf_verify();
     $id = (int) ($_POST['id'] ?? 0);
     $bulan = trim($_POST['bulan'] ?? '');
@@ -58,9 +60,10 @@ if (isset($_POST['update'])) {
 }
 
 // HAPUS STORY
-if (isset($_GET['hapus'])) {
+if (isset($_POST['hapus'])) {
+    csrf_require_post();
     csrf_verify();
-    $id = (int) ($_GET['hapus'] ?? 0);
+    $id = (int) ($_POST['id'] ?? 0);
 
     if ($id <= 0) {
         header('Location: story.php?error=' . urlencode("ID cerita tidak valid."));

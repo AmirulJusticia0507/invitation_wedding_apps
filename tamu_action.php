@@ -4,6 +4,7 @@ include 'koneksi.php';
 
 // SIMPAN TAMU
 if (isset($_POST['simpan'])) {
+    csrf_require_post();
     csrf_verify();
     $nama = trim($_POST['nama'] ?? '');
     $alamat = trim($_POST['alamat'] ?? '');
@@ -29,6 +30,7 @@ if (isset($_POST['simpan'])) {
 
 // UPDATE TAMU
 if (isset($_POST['update'])) {
+    csrf_require_post();
     csrf_verify();
     $id = (int) ($_POST['id'] ?? 0);
     $nama = trim($_POST['nama'] ?? '');
@@ -54,9 +56,10 @@ if (isset($_POST['update'])) {
 }
 
 // HAPUS TAMU
-if (isset($_GET['hapus'])) {
+if (isset($_POST['hapus'])) {
+    csrf_require_post();
     csrf_verify();
-    $id = (int) ($_GET['hapus'] ?? 0);
+    $id = (int) ($_POST['id'] ?? 0);
 
     if ($id <= 0) {
         header('Location: tamu.php?error=' . urlencode("ID tamu tidak valid."));
@@ -64,16 +67,19 @@ if (isset($_GET['hapus'])) {
     }
 
     try {
-        // Hapus link undangan terkait tamu ini
-        $weddingku->query("DELETE FROM undangan_url WHERE tamu_id = $id");
-
+        $weddingku->begin_transaction();
+        $stmtLinks = $weddingku->prepare("DELETE FROM undangan_url WHERE tamu_id = ?");
+        $stmtLinks->bind_param("i", $id);
+        $stmtLinks->execute();
         $stmt = $weddingku->prepare("DELETE FROM tamu WHERE id=?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
+        $weddingku->commit();
 
         header('Location: tamu.php?msg=deleted');
         exit;
     } catch (Throwable $e) {
+        $weddingku->rollback();
         header('Location: tamu.php?error=' . urlencode("Gagal menghapus tamu: " . $e->getMessage()));
         exit;
     }

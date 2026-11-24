@@ -180,6 +180,11 @@ function toggleDarkMode() {
     <li><a href="javascript:void(0)" onclick="showSlide(6)">Slide 6: Wedding Gift</a></li>
     <li><a href="javascript:void(0)" onclick="showSlide(7)">Slide 7: Ucapan & Do'a</a></li>
     </ul>
+    <div class="sidebar-footer">
+        <button class="btn btn-light w-100" onclick="toggleDarkMode()">
+            <i class="fas fa-moon me-2"></i> Ganti Tema
+        </button>
+    </div>
 </div>
 
 <!-- Slide 1 -->
@@ -820,6 +825,16 @@ if (!empty($data['tanggal_akad']) && !empty($data['jam_akad'])) {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js")
       .then((reg) => console.log("Service worker registered.", reg));
+  }
+
+  // Music control
+  function toggleMusic() {
+    var audio = document.getElementById('audioBackground');
+    if (audio.paused) {
+      audio.play();
+    } else {
+      audio.pause();
+    }
   }
 
   // Initialize RSVP form

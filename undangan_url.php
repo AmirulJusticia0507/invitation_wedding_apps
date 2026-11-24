@@ -78,9 +78,9 @@
                                     <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditUndangan{$row['id']}'>
                                         <i class='fa-solid fa-pen-to-square'></i>
                                     </button>
-                                    <a href='" . csrf_url("undangan_url_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger' onclick='return confirm(\"Yakin ingin hapus link ini?\")'>
-                                        <i class='fa-solid fa-trash-can'></i>
-                                    </a>
+                                    <form method='POST' action='undangan_url_action.php' class='d-inline' onsubmit='return confirm(\"Yakin ingin hapus link ini?\")'>
+                                        " . csrf_field() . "<input type='hidden' name='id' value='{$row['id']}'><button type='submit' name='hapus' class='btn btn-sm btn-outline-danger'><i class='fa-solid fa-trash-can'></i></button>
+                                    </form>
                                 </td>
                             </tr>";
                         }
@@ -106,7 +106,7 @@
                 <?= csrf_field() ?>
                 <div class="mb-3">
                     <label class="form-label text-xs text-slate-300">Nama Pasangan Pengantin</label>
-                    <select name="pengantin_id" class="form-select" required>
+                    <select name="pengantin_id" id="pengantin_id_link" class="form-select" required>
                         <option value="">-- Pilih Pengantin --</option>
                         <?php
                         $pengantin = $weddingku->query("SELECT * FROM pengantin");
@@ -165,7 +165,7 @@
                             ?>
                             <tr>
                                 <td class="text-slate-400 text-xs"><?= $noTamu++; ?></td>
-                                <td><input type="checkbox" class="tamu-check form-check-input" data-id="<?= $t['id']; ?>" data-nama="<?= htmlspecialchars($t['nama'], ENT_QUOTES); ?>"></td>
+                                <td><input type="checkbox" class="tamu-check form-check-input" data-id="<?= $t['id']; ?>" data-pengantin-id="<?= $t['pengantin_id']; ?>" data-nama="<?= htmlspecialchars($t['nama'], ENT_QUOTES); ?>"></td>
                                 <td class="font-medium text-white"><?= htmlspecialchars($t['nama']); ?></td>
                                 <td class="text-slate-300 text-xs"><?= htmlspecialchars($t['alamat']); ?></td>
                             </tr>
@@ -349,8 +349,10 @@ $(document).ready(function() {
     document.getElementById('btnPilihTamu')?.addEventListener('click', function () {
         let selectedIds = [];
         let selectedNames = [];
+        const selectedPengantin = document.getElementById('pengantin_id_link')?.value;
 
         document.querySelectorAll('#modalCariTamu .tamu-check:checked').forEach(function (checkbox) {
+            if (checkbox.dataset.pengantinId !== selectedPengantin) return;
             selectedIds.push(checkbox.getAttribute('data-id'));
             selectedNames.push(checkbox.getAttribute('data-nama'));
         });
@@ -359,6 +361,12 @@ $(document).ready(function() {
         const displayEl = document.getElementById('tamu_names_display');
         if (hiddenEl) hiddenEl.value = selectedIds.join(',');
         if (displayEl) displayEl.value = selectedNames.join(', ');
+        if (hiddenEl) hiddenEl.setCustomValidity(selectedIds.length ? '' : 'Pilih tamu yang sesuai dengan pasangan pengantin.');
+    });
+    document.getElementById('pengantin_id_link')?.addEventListener('change', function () {
+        document.querySelectorAll('#modalCariTamu .tamu-check').forEach(function (checkbox) { checkbox.checked = false; });
+        document.getElementById('tamu_ids_hidden').value = '';
+        document.getElementById('tamu_names_display').value = '';
     });
 });
 </script>

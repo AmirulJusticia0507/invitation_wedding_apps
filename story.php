@@ -62,9 +62,9 @@
                                 <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditStory{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i>
                                 </button>
-                                <a href='" . csrf_url("story_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger' onclick=\"return confirm('Yakin ingin menghapus cerita ini?')\">
-                                    <i class='fa-solid fa-trash-can'></i>
-                                </a>
+                                <form method='POST' action='story_action.php' class='d-inline' onsubmit=\"return confirm('Yakin ingin menghapus cerita ini?')\">
+                                    " . csrf_field() . "<input type='hidden' name='id' value='{$row['id']}'><button type='submit' name='hapus' class='btn btn-sm btn-outline-danger'><i class='fa-solid fa-trash-can'></i></button>
+                                </form>
                             </td>
                         </tr>";
 

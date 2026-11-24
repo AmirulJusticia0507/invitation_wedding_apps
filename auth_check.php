@@ -27,3 +27,10 @@ function csrf_verify() {
         die('Permintaan tidak valid (CSRF token tidak cocok).');
     }
 }
+
+function csrf_require_post() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        die('Metode permintaan tidak diizinkan.');
+    }
+}

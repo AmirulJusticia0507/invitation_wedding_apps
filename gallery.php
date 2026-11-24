@@ -83,9 +83,9 @@
                                 <button class='flex-1 btn btn-sm btn-outline-warning text-xs' data-bs-toggle='modal' data-bs-target='#modalEditFoto{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i> Edit
                                 </button>
-                                <a href='" . csrf_url("gallery_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger text-xs' onclick=\"return confirm('Yakin ingin menghapus foto ini?')\">
-                                    <i class='fa-solid fa-trash-can'></i>
-                                </a>
+                                <form method='POST' action='gallery_action.php' class='d-inline' onsubmit=\"return confirm('Yakin ingin menghapus foto ini?')\">
+                                    " . csrf_field() . "<input type='hidden' name='id' value='{$row['id']}'><button type='submit' name='hapus' class='btn btn-sm btn-outline-danger text-xs'><i class='fa-solid fa-trash-can'></i></button>
+                                </form>
                             </div>
                         </div>
                     </div>";
@@ -185,9 +185,9 @@
                                     <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditFoto{$row['id']}'>
                                         <i class='fa-solid fa-pen-to-square'></i>
                                     </button>
-                                    <a href='" . csrf_url("gallery_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger' onclick='return confirm(\"Hapus foto ini?\")'>
-                                        <i class='fa-solid fa-trash-can'></i>
-                                    </a>
+                                    <form method='POST' action='gallery_action.php' class='d-inline' onsubmit='return confirm(\"Hapus foto ini?\")'>
+                                        " . csrf_field() . "<input type='hidden' name='id' value='{$row['id']}'><button type='submit' name='hapus' class='btn btn-sm btn-outline-danger'><i class='fa-solid fa-trash-can'></i></button>
+                                    </form>
                                 </td>
                             </tr>";
                         }

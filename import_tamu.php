@@ -27,9 +27,17 @@ if (isset($_POST['import'])) {
             $spreadsheet = IOFactory::load($file);
             $sheet = $spreadsheet->getActiveSheet()->toArray();
 
+            $checkPengantin = $weddingku->prepare("SELECT id FROM pengantin WHERE id = ?");
+            $checkPengantin->bind_param("i", $pengantin_id);
+            $checkPengantin->execute();
+            if ($checkPengantin->get_result()->num_rows === 0) {
+                throw new Exception("Pasangan pengantin tidak ditemukan.");
+            }
+
             $stmt = $weddingku->prepare("INSERT INTO tamu (nama, alamat, pengantin_id) VALUES (?, ?, ?)");
             $count = 0;
 
+            $weddingku->begin_transaction();
             foreach ($sheet as $index => $row) {
                 if ($index === 0) continue; // skip header row
 
@@ -42,10 +50,12 @@ if (isset($_POST['import'])) {
                     $count++;
                 }
             }
+            $weddingku->commit();
 
             header("Location: tamu.php?msg=" . urlencode("$count data tamu berhasil diimport!"));
             exit;
         } catch (Throwable $e) {
+            try { $weddingku->rollback(); } catch (Throwable $ignored) {}
             header("Location: tamu.php?error=" . urlencode("Gagal import: " . $e->getMessage()));
             exit;
         }

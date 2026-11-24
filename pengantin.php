@@ -91,9 +91,9 @@
                                 <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEdit{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i>
                                 </button>
-                                <a href='" . csrf_url("pengantin_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger' onclick=\"return confirm('Yakin hapus data pengantin ini?')\">
-                                    <i class='fa-solid fa-trash-can'></i>
-                                </a>
+                                <form method='POST' action='pengantin_action.php' class='d-inline' onsubmit=\"return confirm('Yakin hapus data pengantin ini?')\">
+                                    " . csrf_field() . "<input type='hidden' name='id' value='{$row['id']}'><button type='submit' name='hapus' class='btn btn-sm btn-outline-danger'><i class='fa-solid fa-trash-can'></i></button>
+                                </form>
                             </td>
                         </tr>";
 

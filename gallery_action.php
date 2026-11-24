@@ -74,6 +74,7 @@ function processAndSaveImage($tmpFile, $origName, $upload_dir) {
 
 // TAMBAH FOTO
 if (isset($_POST['simpan'])) {
+    csrf_require_post();
     csrf_verify();
     $judul = trim($_POST['judul'] ?? '');
     $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
@@ -113,6 +114,7 @@ if (isset($_POST['simpan'])) {
 
 // UPDATE FOTO
 if (isset($_POST['update'])) {
+    csrf_require_post();
     csrf_verify();
     $id = (int) ($_POST['id'] ?? 0);
     $judul = trim($_POST['judul'] ?? '');
@@ -126,11 +128,16 @@ if (isset($_POST['update'])) {
     }
 
     try {
+        $savedFile = null;
         // Ambil data foto lama
         $stmt_old = $weddingku->prepare("SELECT file, pengantin_id FROM gallery WHERE id=?");
         $stmt_old->bind_param("i", $id);
         $stmt_old->execute();
         $old = $stmt_old->get_result()->fetch_assoc();
+        if (!$old) {
+            header('Location: gallery.php?error=' . urlencode("Foto tidak ditemukan."));
+            exit;
+        }
         $oldFile = $old['file'] ?? '';
         $final_pengantin_id = $pengantin_id > 0 ? $pengantin_id : ($old['pengantin_id'] ?? null);
 
@@ -147,11 +154,6 @@ if (isset($_POST['update'])) {
                 exit;
             }
 
-            // Hapus file lama jika ada
-            if ($oldFile && file_exists($upload_dir . $oldFile)) {
-                @unlink($upload_dir . $oldFile);
-            }
-
             $stmt = $weddingku->prepare("UPDATE gallery SET judul=?, file=?, pengantin_id=? WHERE id=?");
             $stmt->bind_param("ssii", $judul, $savedFile, $final_pengantin_id, $id);
         } else {
@@ -162,18 +164,26 @@ if (isset($_POST['update'])) {
         $stmt->execute();
         $stmt->close();
 
+        if (isset($savedFile) && $oldFile && $oldFile !== $savedFile && file_exists($upload_dir . $oldFile)) {
+            @unlink($upload_dir . $oldFile);
+        }
+
         header('Location: gallery.php?msg=updated');
         exit;
     } catch (Throwable $e) {
+        if (!empty($savedFile) && is_file($upload_dir . basename($savedFile))) {
+            @unlink($upload_dir . basename($savedFile));
+        }
         header('Location: gallery.php?error=' . urlencode("Gagal memperbarui foto: " . $e->getMessage()));
         exit;
     }
 }
 
 // HAPUS FOTO
-if (isset($_GET['hapus'])) {
+if (isset($_POST['hapus'])) {
+    csrf_require_post();
     csrf_verify();
-    $id = (int) ($_GET['hapus'] ?? 0);
+    $id = (int) ($_POST['id'] ?? 0);
 
     if ($id <= 0) {
         header('Location: gallery.php?error=' . urlencode("ID foto tidak valid."));
@@ -187,14 +197,14 @@ if (isset($_GET['hapus'])) {
         $result = $stmt->get_result();
         $foto = $result->fetch_assoc()['file'] ?? null;
 
-        if ($foto && file_exists($upload_dir . $foto)) {
-            @unlink($upload_dir . $foto);
-        }
-
         $stmt = $weddingku->prepare("DELETE FROM gallery WHERE id=?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $stmt->close();
+
+        if ($foto && file_exists($upload_dir . basename($foto))) {
+            @unlink($upload_dir . basename($foto));
+        }
 
         header('Location: gallery.php?msg=deleted');
         exit;

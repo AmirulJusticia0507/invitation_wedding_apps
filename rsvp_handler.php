@@ -1,15 +1,15 @@
 <?php
 include 'koneksi.php'; // Pastikan ini sudah ada untuk koneksi database
 
-$token = $_GET['uid'] ?? null; // Mendapatkan token dari parameter URL
+$token = $_POST['uid'] ?? ($_GET['uid'] ?? null);
+$status = $_POST['status'] ?? 'tidak_hadir';
 
-if ($token) {
-    // Update status RSVP menjadi 'tidak_hadir' berdasarkan token yang terenkripsi
-    $stmt = $weddingku->prepare("UPDATE undangan_url SET status_rsvp = 'tidak_hadir' WHERE encrypted_token = ?");
-    $stmt->bind_param("s", $token);
-    $stmt->execute(); // Eksekusi query
+if ($token && in_array($status, ['hadir', 'tidak_hadir'], true)) {
+    $stmt = $weddingku->prepare("UPDATE undangan_url SET status_rsvp = ? WHERE encrypted_token = ?");
+    $stmt->bind_param("ss", $status, $token);
+    $stmt->execute();
 }
 
-header("Location: index.php?uid=$token"); // Redirect ke halaman utama dengan parameter uid
-exit; // Keluar dari script setelah redirect
+header('Location: index.php?uid=' . rawurlencode((string) $token));
+exit;
 ?>

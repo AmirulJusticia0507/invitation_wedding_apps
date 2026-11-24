@@ -36,7 +36,9 @@
                             <td>{$row['deskripsi']}</td>
                             <td>
                                 <button class='btn btn-sm btn-warning' data-bs-toggle='modal' data-bs-target='#modalEditFolder{$row['id']}'>Edit</button>
-                                <a href='" . csrf_url("folder_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-danger' onclick=\"return confirm('Yakin hapus folder?')\">Hapus</a>
+                                <form method='POST' action='folder_action.php' class='d-inline' onsubmit=\"return confirm('Yakin hapus folder?')\">
+                                    " . csrf_field() . "<input type='hidden' name='id' value='{$row['id']}'><button type='submit' name='hapus' class='btn btn-sm btn-danger'>Hapus</button>
+                                </form>
                             </td>
                         </tr>";
 

@@ -60,14 +60,14 @@
                                 <code class='text-emerald-400 bg-slate-950 px-2 py-1 rounded text-xs font-mono font-bold'>" . h($row['nomor_rekening']) . "</code>
                             </td>
                             <td class='font-semibold text-white'>" . h($row['bank'] ?? '—') . "</td>
-                            <td class='text-slate-300'>" . h($row['catatan']) . "</td>
+                            <td class='text-slate-300'>" . h($row['nama_penerima']) . "</td>
                             <td class='whitespace-nowrap'>
                                 <button class='btn btn-sm btn-outline-warning me-1' data-bs-toggle='modal' data-bs-target='#modalEditRekening{$row['id']}'>
                                     <i class='fa-solid fa-pen-to-square'></i>
                                 </button>
-                                <a href='" . csrf_url("rekening_action.php?hapus={$row['id']}") . "' class='btn btn-sm btn-outline-danger' onclick=\"return confirm('Yakin hapus data rekening ini?')\">
-                                    <i class='fa-solid fa-trash-can'></i>
-                                </a>
+                                <form method='POST' action='rekening_action.php' class='d-inline' onsubmit=\"return confirm('Yakin hapus data rekening ini?')\">
+                                    " . csrf_field() . "<input type='hidden' name='id' value='{$row['id']}'><button type='submit' name='hapus' class='btn btn-sm btn-outline-danger'><i class='fa-solid fa-trash-can'></i></button>
+                                </form>
                             </td>
                         </tr>";
 
@@ -118,7 +118,7 @@
 
                                             <div class='mb-3'>
                                                 <label class='form-label text-xs text-slate-300'>Atas Nama Rekening</label>
-                                                <input type='text' name='catatan' class='form-control' value='" . h($row['catatan']) . "' placeholder='Contoh: Amirul Putra' required>
+                                                <input type='text' name='nama_penerima' class='form-control' value='" . h($row['nama_penerima']) . "' placeholder='Contoh: Amirul Putra' required>
                                             </div>
                                         </div>
                                         <div class='modal-footer'>
@@ -184,7 +184,7 @@
 
                     <div class="mb-3">
                         <label for="catatan" class="form-label text-xs text-slate-300">Atas Nama Rekening</label>
-                        <input type="text" class="form-control" name="catatan" id="catatan" placeholder="Contoh: Amirul Putra" required>
+                        <input type="text" class="form-control" name="nama_penerima" id="nama_penerima" placeholder="Contoh: Amirul Putra" required>
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -72,13 +72,14 @@ function recurse_copy($src, $dst) {
 
 // Menambah Folder
 if (isset($_POST['simpan'])) {
+    csrf_require_post();
     csrf_verify();
-    $nama_folder = $_POST['nama_folder'];
-    $deskripsi = $_POST['deskripsi'];
-    $pengantin_id = $_POST['pengantin_id']; // Get pengantin_id from the form
+    $nama_folder = trim($_POST['nama_folder'] ?? '');
+    $deskripsi = trim($_POST['deskripsi'] ?? '');
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
 
     // Validasi input
-    if (empty($nama_folder) || empty($deskripsi) || empty($pengantin_id)) {
+    if ($nama_folder === '' || $pengantin_id <= 0) {
         echo "<script>alert('Nama folder, deskripsi, dan pengantin_id tidak boleh kosong!'); window.location.href = 'generate_folder.php';</script>";
         exit;
     }
@@ -96,20 +97,22 @@ if (isset($_POST['simpan'])) {
 
 // Mengupdate Folder
 if (isset($_POST['update'])) {
+    csrf_require_post();
     csrf_verify();
-    $id = $_POST['id'];
-    $nama_folder = $_POST['nama_folder'];
-    $deskripsi = $_POST['deskripsi'];
+    $id = (int) ($_POST['id'] ?? 0);
+    $nama_folder = trim($_POST['nama_folder'] ?? '');
+    $deskripsi = trim($_POST['deskripsi'] ?? '');
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
 
     // Validasi input
-    if (empty($nama_folder) || empty($deskripsi)) {
+    if ($id <= 0 || $nama_folder === '' || $pengantin_id <= 0) {
         echo "<script>alert('Nama folder dan deskripsi tidak boleh kosong!'); window.location.href = 'generate_folder.php';</script>";
         exit;
     }
 
     // Update data folder dengan prepared statement
-    $stmt = $weddingku->prepare("UPDATE folders SET nama_folder = ?, deskripsi = ? WHERE id = ?");
-    $stmt->bind_param("ssi", $nama_folder, $deskripsi, $id);
+    $stmt = $weddingku->prepare("UPDATE folders SET nama_folder = ?, deskripsi = ?, pengantin_id = ? WHERE id = ?");
+    $stmt->bind_param("ssii", $nama_folder, $deskripsi, $pengantin_id, $id);
 
     if ($stmt->execute()) {
         echo "<script>alert('Folder berhasil diperbarui'); window.location.href = 'generate_folder.php';</script>";
@@ -119,11 +122,13 @@ if (isset($_POST['update'])) {
 }
 
 // Menghapus Folder
-if (isset($_GET['hapus'])) {
+if (isset($_POST['hapus'])) {
+    csrf_require_post();
     csrf_verify();
-    $id = $_GET['hapus'];
+    $id = (int) ($_POST['id'] ?? 0);
 
     // Hapus data folder
+    if ($id <= 0) { header('Location: generate_folder.php'); exit; }
     $stmt = $weddingku->prepare("DELETE FROM folders WHERE id = ?");
     $stmt->bind_param("i", $id);
 
@@ -136,8 +141,9 @@ if (isset($_GET['hapus'])) {
 
 // Menambahkan folder untuk pasangan (generate folder untuk pengantin)
 if (isset($_POST['generate_folder'])) {
+    csrf_require_post();
     csrf_verify();
-    $pengantin_id = $_POST['pengantin_id']; // Pastikan ada input untuk pengantin_id di form
+    $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
     generateFolderForPasangan($pengantin_id);
 }
 ?>

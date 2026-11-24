@@ -9,6 +9,7 @@ function generateToken($pengantin_id, $tamu_id) {
 
 // Tambah data undangan URL baru
 if (isset($_POST['tambah'])) {
+    csrf_require_post();
     csrf_verify();
     $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
 
@@ -26,21 +27,19 @@ if (isset($_POST['tambah'])) {
     }
 
     try {
-        $stmt_tamu = $weddingku->prepare("SELECT nama FROM tamu WHERE id = ?");
+        $stmt_tamu = $weddingku->prepare("SELECT nama FROM tamu WHERE id = ? AND pengantin_id = ?");
         $stmt_insert = $weddingku->prepare("INSERT INTO undangan_url (pengantin_id, tamu_id, encrypted_token, url_undangan) VALUES (?, ?, ?, ?)");
 
         $count = 0;
         foreach ($tamu_ids as $tamu_id) {
             if ($tamu_id <= 0) continue;
 
-            $token = generateToken($pengantin_id, $tamu_id);
-
-            $stmt_tamu->bind_param("i", $tamu_id);
+            $stmt_tamu->bind_param("ii", $tamu_id, $pengantin_id);
             $stmt_tamu->execute();
             $tamu = $stmt_tamu->get_result()->fetch_assoc();
-            $nama_tamu = $tamu ? urlencode(str_replace(' ', '+', $tamu['nama'])) : '';
-
-            $url = "index.php?uid=$token&guest=$nama_tamu";
+            if (!$tamu) continue;
+            $token = generateToken($pengantin_id, $tamu_id);
+            $url = "index.php?uid=" . rawurlencode($token) . "&guest=" . rawurlencode($tamu['nama']);
 
             $stmt_insert->bind_param("iiss", $pengantin_id, $tamu_id, $token, $url);
             $stmt_insert->execute();
@@ -57,6 +56,7 @@ if (isset($_POST['tambah'])) {
 
 // Edit data undangan URL
 if (isset($_POST['edit'])) {
+    csrf_require_post();
     csrf_verify();
     $id = (int) ($_POST['id'] ?? 0);
     $pengantin_id = (int) ($_POST['pengantin_id'] ?? 0);
@@ -70,20 +70,26 @@ if (isset($_POST['edit'])) {
 
     try {
         // Ambil nama tamu
-        $stmt_tamu = $weddingku->prepare("SELECT nama FROM tamu WHERE id = ?");
-        $stmt_tamu->bind_param("i", $tamu_id);
+        $stmt_tamu = $weddingku->prepare("SELECT nama FROM tamu WHERE id = ? AND pengantin_id = ?");
+        $stmt_tamu->bind_param("ii", $tamu_id, $pengantin_id);
         $stmt_tamu->execute();
         $tamu = $stmt_tamu->get_result()->fetch_assoc();
-        $nama_tamu = $tamu ? urlencode(str_replace(' ', '+', $tamu['nama'])) : '';
+        if (!$tamu) {
+            header("Location: undangan_url.php?error=" . urlencode("Tamu tidak terdaftar pada pasangan pengantin yang dipilih."));
+            exit;
+        }
 
         // Pertahankan token lama jika ada, atau buat baru jika belum
         $stmt_check = $weddingku->prepare("SELECT encrypted_token FROM undangan_url WHERE id = ?");
         $stmt_check->bind_param("i", $id);
         $stmt_check->execute();
         $cur = $stmt_check->get_result()->fetch_assoc();
+        if (!$cur) {
+            header("Location: undangan_url.php?error=" . urlencode("Link undangan tidak ditemukan."));
+            exit;
+        }
         $token = !empty($cur['encrypted_token']) ? $cur['encrypted_token'] : generateToken($pengantin_id, $tamu_id);
-
-        $url = !empty($custom_url) ? $custom_url : "index.php?uid=$token&guest=$nama_tamu";
+        $url = "index.php?uid=" . rawurlencode($token) . "&guest=" . rawurlencode($tamu['nama']);
 
         // Update database
         $stmt = $weddingku->prepare("UPDATE undangan_url SET pengantin_id=?, tamu_id=?, encrypted_token=?, url_undangan=? WHERE id = ?");
@@ -99,9 +105,10 @@ if (isset($_POST['edit'])) {
 }
 
 // Hapus data undangan URL
-if (isset($_GET['hapus'])) {
+if (isset($_POST['hapus'])) {
+    csrf_require_post();
     csrf_verify();
-    $id = (int) ($_GET['hapus'] ?? 0);
+    $id = (int) ($_POST['id'] ?? 0);
 
     if ($id <= 0) {
         header("Location: undangan_url.php?error=" . urlencode("ID undangan tidak valid."));
@@ -123,11 +130,12 @@ if (isset($_GET['hapus'])) {
 
 // Proses konfirmasi RSVP
 if (isset($_POST['konfirmasi'])) {
+    csrf_require_post();
     csrf_verify();
     $id = (int) ($_POST['id'] ?? 0);
     $status = $_POST['status'] ?? ''; // 'hadir' atau 'tidak_hadir'
 
-    if ($status !== 'hadir' && $status !== 'tidak_hadir') {
+    if ($id <= 0 || ($status !== 'hadir' && $status !== 'tidak_hadir')) {
         header("Location: undangan_url.php?error=" . urlencode("Status RSVP tidak valid."));
         exit;
     }

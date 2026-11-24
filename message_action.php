@@ -4,6 +4,7 @@ include 'koneksi.php';
 
 // TAMBAH PESAN
 if (isset($_POST['simpan'])) {
+    csrf_require_post();
     csrf_verify();
     $nama = trim($_POST['nama_pengirim'] ?? '');
     $pesan = trim($_POST['isi_pesan'] ?? '');
@@ -30,6 +31,7 @@ if (isset($_POST['simpan'])) {
 
 // UPDATE PESAN
 if (isset($_POST['update'])) {
+    csrf_require_post();
     csrf_verify();
     $id = (int) ($_POST['id'] ?? 0);
     $nama = trim($_POST['nama_pengirim'] ?? '');
@@ -62,9 +64,10 @@ if (isset($_POST['update'])) {
 }
 
 // HAPUS PESAN
-if (isset($_GET['hapus'])) {
+if (isset($_POST['hapus'])) {
+    csrf_require_post();
     csrf_verify();
-    $id = (int) ($_GET['hapus'] ?? 0);
+    $id = (int) ($_POST['id'] ?? 0);
 
     if ($id <= 0) {
         header('Location: message.php?error=' . urlencode("ID pesan tidak valid."));
